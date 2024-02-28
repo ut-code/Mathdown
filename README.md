@@ -1,6 +1,6 @@
 # Mathdown
 
-## how to setup 
+## how to setup
 
 ```shell
 npm install
@@ -8,9 +8,8 @@ npm install
 
 ## how to run
 
-
 ```shell
-npm run dev 
+npm run dev
 ```
 
 # React + TypeScript + Vite
@@ -32,12 +31,12 @@ If you are developing a production application, we recommend updating the config
 export default {
   // other rules...
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
+    ecmaVersion: "latest",
+    sourceType: "module",
+    project: ["./tsconfig.json", "./tsconfig.node.json"],
     tsconfigRootDir: __dirname,
   },
-}
+};
 ```
 
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
