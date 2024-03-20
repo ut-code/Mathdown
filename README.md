@@ -1,52 +1,29 @@
-# Mathdown
+# HTMLファイルでホバーで解説を見られるようにする仮ツール
 
-## how to setup
+![graph](messageImage_1710930878549.jpg)
 
-```shell
-npm install
-```
+- 取得したHTMLファイルの一部を改変し、ユーザーが特定の文字列（用語）をホバーすると、その用語の解説を見られるようにするツール（仮）です。
 
-## how to run
+- ユーザーはMarkdownをもちいて解説を作成します。
 
-```shell
-npm run dev
-```
+## 使ったパッケージ
 
-## before commit
+- [@tippyjs/react](https://github.com/atomiks/tippyjs-react)
+- [html-react-parser](https://github.com/remarkablemark/html-react-parser)
+- [react-markdown](https://github.com/remarkjs/react-markdown)
+## 主要ファイルとその役割
 
-run
+- `src/App.tsx`
+  - ホバーして解説が読めるように`src/utils/convertHtml.tsx` (後述)によって改変されたhtmlファイルのデータを表示する部分。
 
-```shell
-npm run precommit
-```
+- `public/test.md`
+  - 解説作成のためにユーザーが入力する部分。
 
-# React + TypeScript + Vite
+- `public/hoge.html`
+  - html（本番環境では講義資料）の元データ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- `src/utils/mdModify.tsx`
+  - `public/test.md` の解説データを、`src/utils/convertHtml.tsx` が利用できる形に変更する。
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
-    project: ["./tsconfig.json", "./tsconfig.node.json"],
-    tsconfigRootDir: __dirname,
-  },
-};
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+- `src/utils/convertHtml.tsx`
+  - `public/hoge.html` 講義資料を、`src/utils/mdModify.tsx` を用いて、ホバーで解説が表示できるよう改変する。
