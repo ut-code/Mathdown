@@ -1,3 +1,9 @@
+export function MDToHTML(md: string): string {
+  // TODO!!!! FINISH THIS!!!!!
+  return presetText;
+}
+
+const presetText = `
 <p>地球惑星物理学科とは</p>
 
 <p>
@@ -6,4 +12,8 @@
   人間活動のフロンティアを地球惑星物理学科でともに学びませんか？
 </p>
 
-<p>出典：学科ホームページ（https://www.eps.s.u-tokyo.ac.jp/undergraduate/epp/）より</p>
+<p>
+  出典：学科ホームページ（https://www.eps.s.u-tokyo.ac.jp/undergraduate/epp/）より
+</p>
+
+`;
