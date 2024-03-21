@@ -1,19 +1,19 @@
-export function MDToHTML(md: string): string {
-  // TODO!!!! FINISH THIS!!!!!
-  return presetText;
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkHtml from "remark-html";
+import remarkRehype from "remark-rehype";
+import rehypeKatex from "rehype-katex";
+import rehypeStringify from "rehype-stringify";
+import remarkMath from "remark-math";
+
+export async function MDToHTML(md: string): Promise<string> {
+  return String(
+    await unified()
+      .use(remarkParse)
+      .use(remarkMath)
+      .use(remarkRehype)
+      .use(rehypeKatex)
+      .use(rehypeStringify)
+      .process(md),
+  );
 }
-
-const presetText = `
-<p>地球惑星物理学科とは</p>
-
-<p>
-  地球惑星物理学は、地球や惑星の上で生起する様々な現象を、物理的手法を用いて解明する学問分野です。
-  天気予報や緊急地震速報といった日常生活上のニーズを背景に、地球惑星物理学の対象は極めて多岐に渡っており、太陽系や惑星の進化、宇宙空間での現象までを含んでいます。近年では地球温暖化予想や深海探査、固体地球深部の探査、宇宙における生命発生の探求など、活躍の場は従来にもまして広がりつつあります。
-  人間活動のフロンティアを地球惑星物理学科でともに学びませんか？
-</p>
-
-<p>
-  出典：学科ホームページ（https://www.eps.s.u-tokyo.ac.jp/undergraduate/epp/）より
-</p>
-
-`;

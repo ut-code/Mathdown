@@ -5,7 +5,7 @@ import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import Tippy from "@tippyjs/react";
 
-import HogeLink from "/hoge.md?url";
+import hogeLink from "/hoge.md?url";
 import { ExtractDefinitions } from "./MDToDefinitions";
 import { MDToHTML } from "./MDToHTML";
 
@@ -13,30 +13,62 @@ import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
 
 export default function App() {
-  const [Hoge, setHogeMd] = useState("");
+  const [hogeMd, setHogeMd] = useState("");
+  const [html, setHTML] = useState("");
+  const opts = {
+    prefix: "!define",
+    suffix: "!enddef",
+  };
 
   useEffect(() => {
-    fetch(HogeLink)
+    fetch(hogeLink)
       .then((res) => res.text())
       .then((t) => setHogeMd(t))
       .catch((err) => console.error("Error fetching Hoge.md:", err));
   }, []);
-  if (Hoge === "") {
-    return <></> // avoid unnecessary calculation
+  useEffect(() => {
+    // MDtoHTML is async for some reason.
+    MDToHTML(hogeMd.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, ""))
+      .then((h) => setHTML(h))
+      .catch(console.error);
+  });
+
+  if (hogeMd === "") {
+    return <></>; // avoid unnecessary calculation
   }
-  return <ConvertMarkdown markdown={Hoge} />;
+
+  return <ConvertMarkdown markdown={hogeMd} html={html} opts={opts} />;
 }
 
-export function ConvertMarkdown({ markdown }: { markdown: string }) {
-  const html = MDToHTML(markdown);
-  const words = ExtractDefinitions(markdown, "!define ", "!enddef");
+// this uses given markdown as the source to extract definition from,
+// and given html to render the main note.
+function ConvertMarkdown({
+  markdown,
+  html,
+  opts,
+}: {
+  markdown: string;
+  html: string;
+  opts: { prefix: string; suffix: string };
+}) {
+  const words = ExtractDefinitions(markdown, opts.prefix, opts.suffix);
 
-  let parsedHtml = html; // 初期化されたパースされた HTML 文字列を保持する変数
+  let parsing = html.split("\n");
 
+  // this is O(n**2). reduce the order if you can.
   words.forEach((_, word: string) => {
-    const primer = parsedHtml.split(`${word}`);
-    parsedHtml = primer.join(`<span class="${word}">${word}</span>`); // 置換結果を保持する
+    let idx = 0;
+    for (const line of parsing) {
+      // remove popup of the definition itself, because it looks ugly
+      // I hard-coded the assumption that a definition will turn into h2. if you got any better way to do this, do that.
+      if (!line.includes(`<h2>${word}</h2>`)) {
+        parsing[idx] = line.replaceAll(word, `<span class="${word}">${word}</span>`);
+      }
+      idx++;
+    }
   });
+  let parsedHtml = parsing.join("\n");
+  console.log(parsedHtml);
 
   const options: HTMLReactParserOptions = {
     replace(domNode) {
