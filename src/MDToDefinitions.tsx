@@ -1,5 +1,5 @@
 // FROM: raw user input
-// EXPECT: zero or more definitions described, with "`prefix` DEFWORD0 DEFWORD2..." at the start and "`suffix`" at the end
+// EXPECT: zero or more definitions described, with "`prefix` DEFWORD1 DEFWORD2..." at the start and "`suffix`" at the end
 // RETURN: a map of DEFWORD: string -> DEFINITION: string
 // EDGE CASE:
 // - if `prefix` appears again before `suffix`, finish the last definition and register the new one.
