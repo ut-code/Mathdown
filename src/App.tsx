@@ -33,10 +33,6 @@ export default function App() {
       .catch(console.error);
   });
 
-  if (hogeMd === "") {
-    return <></>; // avoid unnecessary calculation
-  }
-
   return <ConvertMarkdown markdown={hogeMd} html={html} opts={opts} />;
 }
 
