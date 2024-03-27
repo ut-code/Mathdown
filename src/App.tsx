@@ -48,17 +48,17 @@ function ConvertMarkdown({
   opts: { prefix: string; suffix: string };
 }) {
   const words = ExtractDefinitions(markdown, opts.prefix, opts.suffix);
-
   let parsing = html.split("\n");
 
   // this is O(n**2). reduce the order if you can.
   words.forEach((_, word: string) => {
     let idx = 0;
     for (const line of parsing) {
-      // remove popup of the definition itself, because it looks ugly
+      // remove popup of the definition itself, because it looks ugly -> why? look at https://learn.utcode.net/docs/trial-session/html/
       // I hard-coded the assumption that a definition will turn into h2. if you got any better way to do this, do that.
       if (!line.includes(`<h2>${word}</h2>`)) {
-        parsing[idx] = line.replaceAll(word, `<span class="${word}">${word}</span>`);
+        parsing[idx] = line.replaceAll(word, `<span class="underline"><span class="${word}">${word}</span></span>`);
+        // nested span tag to underline targeted words. it doesn't work well with <span class="${word}, underline">. If there are better way, fix it.
       }
       idx++;
     }
