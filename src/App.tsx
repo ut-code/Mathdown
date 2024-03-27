@@ -54,7 +54,7 @@ function ConvertMarkdown({
   words.forEach((_, word: string) => {
     let idx = 0;
     for (const line of parsing) {
-      // remove popup of the definition itself, because it looks ugly -> why? look at https://learn.utcode.net/docs/trial-session/html/
+      // remove popup of the definition itself, because it looks ugly
       // I hard-coded the assumption that a definition will turn into h2. if you got any better way to do this, do that.
       if (!line.includes(`<h2>${word}</h2>`)) {
         parsing[idx] = line.replaceAll(word, `<span class="underline"><span class="${word}">${word}</span></span>`);
