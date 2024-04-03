@@ -58,7 +58,8 @@ function ConvertMarkdown({
       // remove popup of the definition itself, because it looks ugly
       // I hard-coded the assumption that a definition will turn into h2. if you got any better way to do this, do that.
       if (!line.includes(`<h2>${word}</h2>`)) {
-        parsing[idx] = line.replaceAll(word, `<span class="${word}">${word}</span>`);
+        parsing[idx] = line.replaceAll(word, `<span class="underline"><span class="${word}">${word}</span></span>`);
+        // nested span tag to underline targeted words. it doesn't work well with <span class="${word}, underline">. If there are better way, fix it.
       }
       idx++;
     }
