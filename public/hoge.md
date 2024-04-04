@@ -34,3 +34,15 @@ HogeHoge
 運動方程式
 
 - $$ \boldsymbol{F} = m \boldsymbol{a}$$
+
+!define 地球惑星物理学入門
+
+HogeHoge
+
+!define 静水圧平衡
+
+Hoge
+
+!define プレートテクトニクス
+
+Hoge
