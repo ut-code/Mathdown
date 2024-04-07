@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf"; // Make sure to import pdfjs
-import secondPDF from "/chibutsu_nyumon.pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import hogeLink from "/hoge.md?url";
@@ -11,11 +10,10 @@ import Markdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import Tippy from "@tippyjs/react";
-
 // Set the worker source path for pdfjs
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
-export function ExtractPDF() {
+export function ExtractPDF({PDF} : {PDF: string}) {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [result, setResult] = useState<string[]>([]); // 新しいStateを定義
@@ -99,7 +97,7 @@ export function ExtractPDF() {
         <h3>React-pdfを用いてPDFファイルを表示する。</h3>
 
         <Document
-          file={secondPDF}
+          file={PDF}
           options={options}
           onLoadSuccess={onDocumentLoadSuccess}
         >
