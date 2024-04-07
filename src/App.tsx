@@ -5,15 +5,16 @@ import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import Tippy from "@tippyjs/react";
 
-import hogeLink from "/hoge.md?url";
+import markdownLink from "/hoge.md?url";
 import { ExtractDefinitions } from "./MDToDefinitions";
 import { MDToHTML } from "./MDToHTML";
+import { replaceMathjsToTex } from "./mathjs-tex";
 
 import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
 
 export default function App() {
-  const [hogeMd, setHogeMd] = useState("");
+  const [markdown, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
   const opts = {
     prefix: "!define",
@@ -21,14 +22,15 @@ export default function App() {
   };
 
   useEffect(() => {
-    fetch(hogeLink)
+    fetch(markdownLink)
       .then((res) => res.text())
-      .then((t) => setHogeMd(t))
+      .then((t) => setMarkdown(t))
       .catch((err) => console.error("Error fetching Hoge.md:", err));
   }, []);
   useEffect(() => {
     // MDtoHTML is async for some reason.
-    MDToHTML(hogeMd.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, ""))
+    markdown
+    MDToHTML(.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, ""))
       .then((h) => setHTML(h))
       .catch(console.error);
   });
