@@ -14,12 +14,10 @@ import Tippy from "@tippyjs/react";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 export function ExtractPDF({PDF} : {PDF: string}) {
-  const [numPages, setNumPages] = useState<number>(0);
+  const [numPages, setNumPages] = useState<number>(-1);
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [result, setResult] = useState<string[]>([]); // 新しいStateを定義
-  const resultList: string[] = []; // pdfから抜き取った情報を、ここから抜いていく。
   const [hogeMd, setHogeMd] = useState("");
-  const [newResult, setNewResult] = useState<string[]>([""]); // resultとnewResultに関して、何か無駄な部分がありそう。
+  const [result, setResult] = useState<string[]>([]);
   const opts = {
     prefix: "!define",
     suffix: "!enddef",
@@ -27,7 +25,7 @@ export function ExtractPDF({PDF} : {PDF: string}) {
 
   const options = useMemo(
     () => ({
-      cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+      cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`, // 文字のエンコーディングに関する設定
       cMapPacked: true,
     }),
     []
@@ -48,18 +46,16 @@ export function ExtractPDF({PDF} : {PDF: string}) {
 
   // pdfから文字を抜き出す非同期関数
   async function extractTextFromPDF(pdf: {
-    getPage: (arg0: any) => any;
-    numPages: any;
+    getPage: (arg0: number) => any;
+    numPages: number;
   }) {
     const getPageText = async (pageNum: number) => {
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
+      const page = await pdf.getPage(pageNum); // pdfは引数
+      const textContent = await page.getTextContent(); // console.log(textContent.items); をしてみると良い。
       const renderedTextContent = textContent.items
-        .map((item: { str: any }) => item.str)
+        .map((item: { str: string }) => item.str)
         .join("");
-      resultList.push(renderedTextContent);
-      setResult(resultList);
-      // console.log(result);
+      result.push(renderedTextContent);
     };
 
     const numPages = pdf.numPages;
@@ -71,24 +67,18 @@ export function ExtractPDF({PDF} : {PDF: string}) {
 
   // pdfが読み込み成功した際に実行される非同期関数。
   async function onDocumentLoadSuccess(pdf: { numPages: any; getPage: any }) {
+    await extractTextFromPDF(pdf);
     const numPages = pdf.numPages;
     setNumPages(numPages); // Extract text from PDF
-    await extractTextFromPDF(pdf);
   }
-
   useEffect(() => {
+    setResult(result); // なぜかこれはなくてもうまくいく。しかしだからと言って `const result: string[] = []`と20行目で宣言してもうまくいかない。
     fetch(hogeLink)
       .then((res) => res.text())
       .then((t) => setHogeMd(t))
       .catch((err) => console.error("Error fetching Hoge.md:", err));
   }, []);
-
-  // pdfの文字情報が読み取られ、result変数に反映されるのに時間がかかるため、
-  // 初期条件として空の文字列を入れて、変更が起こった時にresultをnewResultに代入し、ReferMapに反映されるようにしている。
-  useEffect(() => {
-    setNewResult(result); 
-  });
-
+  
   const dict = ExtractDefinitions(hogeMd, opts.prefix, opts.suffix);
 
   return (
@@ -118,14 +108,14 @@ export function ExtractPDF({PDF} : {PDF: string}) {
         <ul>
           <ReferMap
             dictionary={dict}
-            searchString={newResult[pageNumber - 1] || ""}
+            searchString={result[pageNumber - 1] || ""}
           />
         </ul>
       </div>
       <div className="blockb">
         <h3>react-pdfを用いて抜き出した文字情報</h3>
         <hr />
-        <p>{result[pageNumber - 1]}</p>
+        <p>{result[pageNumber - 1] || ""}</p>
         <hr />
       </div>
     </div>
