@@ -43,7 +43,7 @@ export default function App() {
       const p = MDToHTML(md).then((newv) => newd.set(k, newv));
       promises.push(p);
     });
-    Promise.all(promises).then(console.log("new dict: ", newd)).then(() => setDict(newd));
+    Promise.all(promises).then(() => setDict(newd));
 
     // prepare HTML
     var md;
@@ -75,7 +75,6 @@ function ConvertMarkdown({
 
   // this is O(n**2). reduce the order if you can.
   dictionary.forEach((_def: string, word: string) => {
-    console.log(`word: ${word}, definition: ${_def}`);
     let idx = 0;
     for (const line of parsing) {
       // remove popup of the definition itself, because it looks ugly
