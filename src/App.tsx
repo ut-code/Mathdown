@@ -37,13 +37,13 @@ export default function App() {
     let d = ExtractDefinitions(markdown, opts.prefix, opts.suffix);
     const newd = new Map<string, string>();
     const promises = [];
-    d.forEach((k, v) => {
+    d.forEach((v, k) => {
       let md = replaceExternalSyntax(v);
       md = md.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, "");
       const p = MDToHTML(md).then((newv) => newd.set(k, newv));
       promises.push(p);
     });
-    Promise.all(promises).then(() => setDict(newd));
+    Promise.all(promises).then(console.log("new dict: ", newd)).then(() => setDict(newd));
 
     // prepare HTML
     var md;
@@ -54,7 +54,7 @@ export default function App() {
     }
     MDToHTML(md.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, ""))
       .then((h) => setHTML(h))
-      .catch(() => "MDToHTML failed");
+      .catch(() => console.log("MDToHTML failed"));
   }
 
   return <ConvertMarkdown dictionary={dict} html={html} opts={opts} />;
@@ -74,7 +74,8 @@ function ConvertMarkdown({
   let parsing = html.split("\n");
 
   // this is O(n**2). reduce the order if you can.
-  dictionary.forEach((_, word: string) => {
+  dictionary.forEach((_def: string, word: string) => {
+    console.log(`word: ${word}, definition: ${_def}`);
     let idx = 0;
     for (const line of parsing) {
       // remove popup of the definition itself, because it looks ugly
@@ -85,7 +86,6 @@ function ConvertMarkdown({
           word,
           `<span class="${word} underline">${word}</span>`,
         );
-        // nested span tag to underline targeted dictionary. it doesn't work well with <span class="${word}, underline">. If there are better way, fix it.
       }
       idx++;
     }
@@ -119,4 +119,8 @@ function ConvertMarkdown({
   };
 
   return <>{parse(parsedHtml, options)}</>; // パースされた HTML を返す
+}
+function inspect<T>(target: T): T {
+  console.log(target);
+  return target;
 }
