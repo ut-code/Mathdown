@@ -1,12 +1,12 @@
 import * as math from "mathjs";
 
-/* example syntax (mathjs): 
+/* example syntax / mathjs: 
 input:
 
 !define ピタゴラスの定理
 
 $$
-c = sqrt(a**2 + b**2)
+c = sqrt(a^2 + b^2)
 $$
 
 output:
@@ -22,7 +22,7 @@ type markdown = string;
 type AvailableSyntaxes = 
   | "mathjs" // mathjs-powered simplified TeX
   | "math" // literal KaTeX
-  | "unspecified"; // default value; (must be) impossible to reach
+  | "unspecified"; // default value; (should be) impossible to reach
 
 // WARNING: this function may fail if m contains invalid syntax \ invalid syntax type (not in the AvailableSyntaxes)
 export function replaceExternalSyntax(m: markdown): markdown {
