@@ -10,14 +10,17 @@ import Markdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import Tippy from "@tippyjs/react";
+// import { text } from "stream/consumers";
 // Set the worker source path for pdfjs
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+import Textarea from "@mui/joy/Textarea";
 
-export function ExtractPDF({PDF} : {PDF: string}) {
+export function ExtractPDF({ PDF }: { PDF: string }) {
   const [numPages, setNumPages] = useState<number>(-1);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [hogeMd, setHogeMd] = useState("");
   const [result, setResult] = useState<string[]>([]);
+  const [explanation, setExplanation] = useState<string>(""); // ユーザー入力の部分。今は暫定的にテキストエリアを置いている。
   const opts = {
     prefix: "!define",
     suffix: "!enddef",
@@ -72,51 +75,56 @@ export function ExtractPDF({PDF} : {PDF: string}) {
     setNumPages(numPages); // Extract text from PDF
   }
   useEffect(() => {
-    setResult(result); // なぜかこれはなくてもうまくいく。しかしだからと言って `const result: string[] = []`と20行目で宣言してもうまくいかない。
     fetch(hogeLink)
       .then((res) => res.text())
       .then((t) => setHogeMd(t))
       .catch((err) => console.error("Error fetching Hoge.md:", err));
   }, []);
-  
-  const dict = ExtractDefinitions(hogeMd, opts.prefix, opts.suffix);
+
+  // const dict = ExtractDefinitions(hogeMd, opts.prefix, opts.suffix);
 
   return (
-    <div>
-      <div className="blocka">
-        <h3>React-pdfを用いてPDFファイルを表示する。</h3>
-
-        <Document
-          file={PDF}
-          options={options}
-          onLoadSuccess={onDocumentLoadSuccess}
-        >
-          <Page pageNumber={pageNumber} />
-        </Document>
-
-        <p>
-          Page {pageNumber} of {numPages}
-        </p>
-        <button disabled={pageNumber <= 1} onClick={goToPrevPage}>
-          Prev
-        </button>
-        <button disabled={pageNumber >= numPages} onClick={goToNextPage}>
-          Next
-        </button>
-
-        <h3>こんな解説の加え方もあり。（PDFファイルの表示されているページから、ノートに載っている用語を抜き出し、ポップアップする。</h3>
+    <div className="flex">
+        <div className="account">
+        <h2>PDFの解説表示</h2>
         <ul>
           <ReferMap
-            dictionary={dict}
+            dictionary={ExtractDefinitions(explanation, opts.prefix, opts.suffix)} // ユーザー入力（暫定）から定義を抜き出している。
             searchString={result[pageNumber - 1] || ""}
           />
         </ul>
-      </div>
-      <div className="blockb">
-        <h3>react-pdfを用いて抜き出した文字情報</h3>
-        <hr />
-        <p>{result[pageNumber - 1] || ""}</p>
-        <hr />
+        </div>
+        <div className="pdf">
+          <p>
+            Page {pageNumber} of {numPages}
+          </p>
+          <button disabled={pageNumber <= 1} onClick={goToPrevPage}>
+            Prev
+          </button>
+          <button disabled={pageNumber >= numPages} onClick={goToNextPage}>
+            Next
+          </button>
+
+            <Document
+              file={PDF}
+              options={options}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              <Page pageNumber={pageNumber} height={1200} />
+            </Document>
+        </div>
+
+      <div className="textarea">
+        <h4>解説書き込み欄</h4>
+        <p>
+          <Textarea
+            placeholder="解説をコピー"
+            minRows={14}
+            onChange={(e) => {
+              setExplanation(e.target.value);
+            }}
+          />
+        </p>
       </div>
     </div>
   );

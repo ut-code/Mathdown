@@ -35,6 +35,33 @@ h1 {
   line-height: 1.1;
 }
 
+.account {
+  margin: 5px;
+  background-color: #e2f8ff;
+  border-radius: 4px;
+  width: 100%;
+  min-height: 600px;
+}
+
+.pdf {
+  background-color: rgb(78, 78, 78);
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+@media (min-width: 767px) {
+  .flex {
+    display: flex;
+  }
+  .account {
+    width: 500px;
+  }
+  .textarea {
+    margin: 10px;
+  }
+}
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;

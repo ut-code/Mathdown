@@ -17,7 +17,7 @@ import  pdfFile  from "/chibutsu_nyumon.pdf";
 
 export default function App() {
   const [hogeMd, setHogeMd] = useState("");
-  const [html, setHTML] = useState("");
+  const [html, setHTML] = useState(""); // 残しておくように。
   const opts = {
     prefix: "!define",
     suffix: "!enddef",
@@ -38,8 +38,10 @@ export default function App() {
 
   const dict = ExtractDefinitions(hogeMd, opts.prefix, opts.suffix);
 
-  return <><ConvertMarkdown dictionary={dict} html={html} opts={opts} />
-  <ExtractPDF PDF={pdfFile} /></>;
+  //  return <><ConvertMarkdown dictionary={dict} html={html} opts={opts} /> // 残しておくように。
+  return <>
+      <ExtractPDF PDF={pdfFile} />
+  </>;
 }
 
 // this uses given markdown as the source to extract definition from,
