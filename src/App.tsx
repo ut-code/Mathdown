@@ -13,7 +13,7 @@ import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
 
 import { ExtractPDF } from "./extractPDF";
-import  pdfFile  from "/chibutsu_nyumon.pdf";
+import pdfFile from "/chibutsu_nyumon.pdf";
 
 export default function App() {
   const [hogeMd, setHogeMd] = useState("");
@@ -38,10 +38,13 @@ export default function App() {
 
   const dict = ExtractDefinitions(hogeMd, opts.prefix, opts.suffix);
 
-  return <><ConvertMarkdown dictionary={dict} html={html} opts={opts} /> 
-  
+  return (
+    <>
+      <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
+
       <ExtractPDF pdfName={pdfFile} opts={opts} />
-  </>;
+    </>
+  );
 }
 
 // this uses given markdown as the source to extract definition from,
@@ -54,7 +57,6 @@ function ConvertMarkdown({
   html: string;
   opts: { prefix: string; suffix: string };
 }) {
-
   let parsing = html.split("\n");
 
   // this is O(n**2). reduce the order if you can.
@@ -65,11 +67,14 @@ function ConvertMarkdown({
       // I hard-coded the assumption that a definition will turn into h2. if you got any better way to do this, do that.
       if (!line.includes(`<h2>${word}</h2>`)) {
         // make sure ${word} is the first attribute of class; otherwise the word replacement below will fail.
-        parsing[idx] = line.replaceAll(word, `<span class="${word} underline">${word}</span>`);
+        parsing[idx] = line.replaceAll(
+          word,
+          `<span class="${word} underline">${word}</span>`,
+        );
         // nested span tag to underline targeted dictionary. it doesn't work well with <span class="${word}, underline">. If there are better way, fix it.
-	//   there are two reasons it didn't work:
-	//   - class divider is " ", not ", "
-	//   - domNode.attribs.class will be `${word} underline` so it doesn't match word
+        //   there are two reasons it didn't work:
+        //   - class divider is " ", not ", "
+        //   - domNode.attribs.class will be `${word} underline` so it doesn't match word
       }
       idx++;
     }
@@ -85,7 +90,10 @@ function ConvertMarkdown({
       // domNode の最初の class 属性を取り出す。 (indexError でなく undefined になるため、[0] は安全)
       const word: string | undefined = domNode?.attribs?.class?.split(" ")[0];
       // HTML 的には多分動くが、気持ち悪いので最初の class 属性 = word を排除
-      const newClass: string = domNode?.attribs?.class?.split(" ").slice(0).join(" ");
+      const newClass: string = domNode?.attribs?.class
+        ?.split(" ")
+        .slice(0)
+        .join(" ");
       // 与えられたノードが Element であり、その class 属性が undefined または空文字列でなく、 dictionary 内のいずれかの単語と一致するかどうかを確認
       if (word && domNode.attribs?.class && dictionary.has(word)) {
         return (
