@@ -15,16 +15,18 @@ import Tippy from "@tippyjs/react";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 import Textarea from "@mui/joy/Textarea";
 
-export function ExtractPDF({ PDF }: { PDF: string }) {
+type optsObject = {prefix: string, suffix: string} // 具体的には、!defineという接頭辞、!enddefという接尾辞を指す。
+type pdfType = { numPages: number; getPage: (arg0: number) => any } // React-pdfで取得されるPDFには、合計ページ数を指す`numPage`属性と、それぞれのページの（文字列などの）情報を含む`getPages`を含む。
+// 使用法
+// const page = await pdf.getPage(5); // 5ページ目の情報取得
+// const textContent = await page.getTextContent(); // getTextContent属性で文字列取得。
+
+export function ExtractPDF({ pdfName, opts }: { pdfName: string, opts: optsObject}) { // `PDF`
   const [numPages, setNumPages] = useState<number>(-1);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [hogeMd, setHogeMd] = useState("");
   const [result, setResult] = useState<string[]>([]);
   const [explanation, setExplanation] = useState<string>(""); // ユーザー入力の部分。今は暫定的にテキストエリアを置いている。
-  const opts = {
-    prefix: "!define",
-    suffix: "!enddef",
-  };
 
   const options = useMemo(
     () => ({
@@ -48,32 +50,29 @@ export function ExtractPDF({ PDF }: { PDF: string }) {
   };
 
   // pdfから文字を抜き出す非同期関数
-  async function extractTextFromPDF(pdf: {
-    getPage: (arg0: number) => any;
-    numPages: number;
-  }) {
+  async function extractTextFromPDF(pdf: pdfType) {
+    let resultContent: any[] = [];
     const getPageText = async (pageNum: number) => {
-      const page = await pdf.getPage(pageNum); // pdfは引数
+      const page = await pdf.getPage(pageNum); 
       const textContent = await page.getTextContent(); // console.log(textContent.items); をしてみると良い。
       const renderedTextContent = textContent.items
         .map((item: { str: string }) => item.str)
         .join("");
-      result.push(renderedTextContent);
+      resultContent.push(renderedTextContent);
     };
-
-    const numPages = pdf.numPages;
-
-    for (let i = 1; i <= numPages; i++) {
+    for (let i = 1; i <= pdf.numPages; i++) { // グローバルのnumPageでなく、pdf.numPagesなのは、初回レンダー時にpdfのページ数が必要になるため。
       await getPageText(i);
     }
+    setResult(resultContent);
   }
 
   // pdfが読み込み成功した際に実行される非同期関数。
-  async function onDocumentLoadSuccess(pdf: { numPages: any; getPage: any }) {
+  async function onDocumentLoadSuccess(pdf: pdfType) {
     await extractTextFromPDF(pdf);
-    const numPages = pdf.numPages;
-    setNumPages(numPages); // Extract text from PDF
+    setNumPages(pdf.numPages);
   }
+
+  // マークダウンの内容を取得するためのフック。
   useEffect(() => {
     fetch(hogeLink)
       .then((res) => res.text())
@@ -106,7 +105,7 @@ export function ExtractPDF({ PDF }: { PDF: string }) {
           </button>
 
             <Document
-              file={PDF}
+              file={pdfName}
               options={options}
               onLoadSuccess={onDocumentLoadSuccess}
             >

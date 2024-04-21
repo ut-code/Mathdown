@@ -17,7 +17,7 @@ import  pdfFile  from "/chibutsu_nyumon.pdf";
 
 export default function App() {
   const [hogeMd, setHogeMd] = useState("");
-  const [html, setHTML] = useState(""); // 残しておくように。
+  const [html, setHTML] = useState("");
   const opts = {
     prefix: "!define",
     suffix: "!enddef",
@@ -38,9 +38,9 @@ export default function App() {
 
   const dict = ExtractDefinitions(hogeMd, opts.prefix, opts.suffix);
 
-  //  return <><ConvertMarkdown dictionary={dict} html={html} opts={opts} /> // 残しておくように。
-  return <>
-      <ExtractPDF PDF={pdfFile} />
+  return <><ConvertMarkdown dictionary={dict} html={html} opts={opts} /> 
+  
+      <ExtractPDF pdfName={pdfFile} opts={opts} />
   </>;
 }
 
@@ -49,7 +49,6 @@ export default function App() {
 function ConvertMarkdown({
   dictionary,
   html,
-  opts,
 }: {
   dictionary: Map<string, string>;
   html: string;
@@ -80,12 +79,15 @@ function ConvertMarkdown({
 
   const options: HTMLReactParserOptions = {
     replace(domNode) {
+      if (!(domNode instanceof Element)) {
+        return domNode;
+      }
       // domNode の最初の class 属性を取り出す。 (indexError でなく undefined になるため、[0] は安全)
-      const word: string | undefined = domNode.attribs?.class?.split(" ")[0];
+      const word: string | undefined = domNode?.attribs?.class?.split(" ")[0];
       // HTML 的には多分動くが、気持ち悪いので最初の class 属性 = word を排除
-      const newClass: string = domNode.attribs?.class?.split(" ").slice(0).join(" ");
+      const newClass: string = domNode?.attribs?.class?.split(" ").slice(0).join(" ");
       // 与えられたノードが Element であり、その class 属性が undefined または空文字列でなく、 dictionary 内のいずれかの単語と一致するかどうかを確認
-      if (domNode instanceof Element && domNode.attribs?.class && dictionary.has(word)) {
+      if (word && domNode.attribs?.class && dictionary.has(word)) {
         return (
           <Tippy
             content={
@@ -106,5 +108,5 @@ function ConvertMarkdown({
     },
   };
 
-  return <><div>{parse(parsedHtml, options)}</div></>; // パースされた HTML を返す
+  return <>{parse(parsedHtml, options)}</>; // パースされた HTML を返す
 }
