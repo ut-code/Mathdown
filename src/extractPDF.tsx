@@ -21,7 +21,7 @@ type pdfType = { numPages: number; getPage: (arg0: number) => any } // React-pdf
 // const page = await pdf.getPage(5); // 5ページ目の情報取得
 // const textContent = await page.getTextContent(); // getTextContent属性で文字列取得。
 
-export function ExtractPDF({ pdfName, opts }: { pdfName: string, opts: optsObject}) { // `PDF`
+export function ExtractPDF({ pdfName, opts }: { pdfName: string, opts: optsObject}) { 
   const [numPages, setNumPages] = useState<number>(-1);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [hogeMd, setHogeMd] = useState("");
