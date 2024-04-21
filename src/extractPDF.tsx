@@ -15,7 +15,7 @@ import Tippy from "@tippyjs/react";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 import Textarea from "@mui/joy/Textarea";
 
-type optsObject = { prefix: string; suffix: string }; // 具体的には、!defineという接頭辞、!enddefという接尾辞を指す。
+type optsObject = { prefix: string; suffix: string }; 
 type pdfType = { numPages: number; getPage: (arg0: number) => any }; // React-pdfで取得されるPDFには、合計ページ数を指す`numPage`属性と、それぞれのページの（文字列などの）情報を含む`getPages`を含む。
 // 使用法
 // const page = await pdf.getPage(5); // 5ページ目の情報取得
