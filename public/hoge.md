@@ -13,19 +13,19 @@
 
 !define 天気予報
 
-Hoge
+Foo 天気予報
 
 !define 宇宙空間
 
-Hoge
+Bar 宇宙空間
 
 !define 緊急地震速報
 
-Hoge
+Baz 緊急地震速報
 
 !define 地球温暖化
 
-HogeHoge
+FooBar 地球温暖化
 
 !define 物理的手法
 
@@ -33,4 +33,14 @@ HogeHoge
 
 運動方程式
 
-- $$ \boldsymbol{F} = m \boldsymbol{a}$$
+```mathjs
+F = ma
+```
+
+!define ピタゴラスの定理
+
+ピタゴラスの定理は、
+```mathjs
+c = sqrt(a^2 + b^2)
+```
+である。
