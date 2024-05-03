@@ -9,6 +9,8 @@ import markdownLink from "/hoge.md?url";
 import { ExtractDefinitions } from "./MDToDefinitions";
 import { MDToHTML } from "./MDToHTML";
 import { replaceExternalSyntax } from "./external-syntax";
+import { ExtractPDF } from "./extractPDF";
+import pdfFile from "/chibutsu_nyumon.pdf";
 
 import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
@@ -36,7 +38,7 @@ export default function App() {
     // prepare dictionary
     let d = ExtractDefinitions(markdown, opts.prefix, opts.suffix);
     const newd = new Map<string, string>();
-    const promises = [];
+    const promises: Promise<Map<string, string>>[] = [];
     d.forEach((v, k) => {
       let md = replaceExternalSyntax(v);
       md = md.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, "");
@@ -49,7 +51,7 @@ export default function App() {
     var md;
     try {
       md = replaceExternalSyntax(markdown);
-    } catch (e) {
+    } catch (e: any) {
       md = e.toString();
     }
     MDToHTML(md.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, ""))
@@ -57,7 +59,13 @@ export default function App() {
       .catch(() => console.log("MDToHTML failed"));
   }
 
-  return <ConvertMarkdown dictionary={dict} html={html} opts={opts} />;
+  return (
+    <>
+      <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
+
+      <ExtractPDF pdfName={pdfFile} opts={opts} />
+      </>
+  );
 }
 
 // this uses given dictionary as the source to extract definition from,
@@ -65,7 +73,6 @@ export default function App() {
 function ConvertMarkdown({
   dictionary,
   html,
-  opts,
 }: {
   dictionary: Map<string, string>;
   html: string;
@@ -93,6 +100,9 @@ function ConvertMarkdown({
 
   const options: HTMLReactParserOptions = {
     replace(domNode) {
+      if (!(domNode instanceof Element)) {
+        return domNode
+      }
       // domNode の最初の class 属性を取り出す。 (indexError でなく undefined になるため、[0] は安全)
       const word: string | undefined = domNode.attribs?.class?.split(" ")[0];
       // HTML 的には多分動くが、気持ち悪いので最初の class 属性 = word を排除
@@ -108,7 +118,7 @@ function ConvertMarkdown({
       ) {
         return (
           // dictionary.get(word) is an html and therefore must not be used directly
-          <Tippy content={parse(dictionary.get(word))}>
+          <Tippy content={parse(dictionary.get(word) || "")}>
             <span className={newClass}>{word}</span>
           </Tippy>
         );
