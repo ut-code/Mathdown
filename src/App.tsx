@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import parse, { Element, HTMLReactParserOptions } from "html-react-parser";
-import Markdown from "react-markdown";
-import rehypeKatex from "rehype-katex";
-import remarkMath from "remark-math";
+// import Markdown from "react-markdown";
+// import rehypeKatex from "rehype-katex";
+// import remarkMath from "remark-math";
 import Tippy from "@tippyjs/react";
 
 import markdownLink from "/hoge.md?url";
