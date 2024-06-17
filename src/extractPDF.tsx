@@ -10,12 +10,18 @@ import Markdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import Tippy from "@tippyjs/react";
+
+// react-pdfから持ってきたcss https://github.com/wojtekmaj/react-pdf/discussions/1407 参照
+
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+
 // import { text } from "stream/consumers";
 // Set the worker source path for pdfjs
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 import Textarea from "@mui/joy/Textarea";
 
-type optsObject = { prefix: string; suffix: string }; 
+type optsObject = { prefix: string; suffix: string };
 type pdfType = { numPages: number; getPage: (arg0: number) => any }; // React-pdfで取得されるPDFには、合計ページ数を指す`numPage`属性と、それぞれのページの（文字列などの）情報を含む`getPages`を含む。
 // 使用法
 // const page = await pdf.getPage(5); // 5ページ目の情報取得
@@ -34,12 +40,26 @@ export function ExtractPDF({
   const [result, setResult] = useState<string[]>([]);
   const [explanation, setExplanation] = useState<string>(""); // ユーザー入力の部分。今は暫定的にテキストエリアを置いている。
 
+  const array: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
+  const reactArray: any = array.map((index) => {
+    // ページ数をどうにか見える化したい。
+    return (
+      <Page
+        pageNumber={index}
+        width={850}
+        key={index}
+        canvasBackground="white"
+        scale={1}
+        className="design"
+      />
+    );
+  });
   const options = useMemo(
     () => ({
       cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`, // 文字のエンコーディングに関する設定
       cMapPacked: true,
     }),
-    [],
+    []
   );
 
   // ページ移動
@@ -90,53 +110,61 @@ export function ExtractPDF({
   // const dict = ExtractDefinitions(hogeMd, opts.prefix, opts.suffix);
 
   return (
-    <div className="flex">
-      <div className="account">
-        <h2>PDFの解説表示</h2>
-        <ul>
-          <ReferMap
-            dictionary={ExtractDefinitions(
-              explanation,
-              opts.prefix,
-              opts.suffix,
-            )} // ユーザー入力（暫定）から定義を抜き出している。
-            searchString={result[pageNumber - 1] || ""}
-          />
-        </ul>
-      </div>
-      <div className="pdf">
-        <p>
-          Page {pageNumber} of {numPages}
-        </p>
-        <button disabled={pageNumber <= 1} onClick={goToPrevPage}>
-          Prev
-        </button>
-        <button disabled={pageNumber >= numPages} onClick={goToNextPage}>
-          Next
-        </button>
+    <>
+      <h2>PDFの解説表示</h2>
+      <div className="flex">
+        <div className="explanation">
+          <div className="textarea">
+            <h4>解説書き込み欄</h4>
+          </div>
+          <div className="terms">
+            <p>
+               {pageNumber}ページ目 （{numPages}頁中）
+            </p>
+            <button disabled={pageNumber <= 1} onClick={goToPrevPage}>
+              前ページ
+            </button>
+            <button disabled={pageNumber >= numPages} onClick={goToNextPage}>
+              次ページ
+            </button>
+            <ul>
+              <ReferMap
+                dictionary={ExtractDefinitions(
+                  explanation,
+                  opts.prefix,
+                  opts.suffix
+                )} // ユーザー入力（暫定）から定義を抜き出している。
+                searchString={result.join("") || ""}
+                referedString = {result[pageNumber - 1]}
+              />
+            </ul>
+          </div>
+          <p>
+              <Textarea
+                placeholder="解説をコピー"
+                minRows={14}
+                onChange={(e) => {
+                  setExplanation(e.target.value);
+                }}
+              />
+            </p>
+        </div>
 
-        <Document
-          file={pdfName}
-          options={options}
-          onLoadSuccess={onDocumentLoadSuccess}
-        >
-          <Page pageNumber={pageNumber} height={1200} />
-        </Document>
+        <div className="pdf">
+          {/* pdf ビューワ */}
+          <div className="pdf_viewer">
+            <Document
+              file={pdfName}
+              options={options}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              {/* <Page pageNumber={pageNumber} height={1200} canvasBackground="red" scale={0.5} className="design" /> */}
+              {reactArray}
+            </Document>
+          </div>
+        </div>
       </div>
-
-      <div className="textarea">
-        <h4>解説書き込み欄</h4>
-        <p>
-          <Textarea
-            placeholder="解説をコピー"
-            minRows={14}
-            onChange={(e) => {
-              setExplanation(e.target.value);
-            }}
-          />
-        </p>
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -144,18 +172,20 @@ export function ExtractPDF({
 function ReferMap({
   dictionary,
   searchString,
+  referedString //  ある条件を満たす用語は、ブラウザ上で水色に変化する。
 }: {
   dictionary: Map<string, string>;
   searchString: string;
+  referedString: string;
 }) {
   // Filter dictionary keys based on whether they are included in the search string
   const filteredKeys = Array.from(dictionary.keys()).filter((key) =>
-    searchString.includes(key),
+    searchString.includes(key)
   );
 
   // Map filtered keys to JSX elements
   const li = filteredKeys.map((key) => (
-    <li key={key}>
+    <li key={key} className={referedString.includes(key) ? "color_of_li": ""}>
       <Tippy
         content={
           <Markdown rehypePlugins={[rehypeKatex]} remarkPlugins={[remarkMath]}>
