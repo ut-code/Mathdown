@@ -154,7 +154,6 @@ export default function App() {
           </button>
         </>
       )}
-      ;
     </>
   );
 }
