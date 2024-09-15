@@ -18,7 +18,7 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 
 // import { text } from "stream/consumers";
 // Set the worker source path for pdfjs
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc =  `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.mjs`;
 import Textarea from "@mui/joy/Textarea";
 
 type optsObject = { prefix: string; suffix: string };
@@ -139,7 +139,7 @@ export function ExtractPDF({
               />
             </ul>
           </div>
-          <p>
+          <div>
               <Textarea
                 placeholder="解説をコピー"
                 minRows={14}
@@ -147,7 +147,7 @@ export function ExtractPDF({
                   setExplanation(e.target.value);
                 }}
               />
-            </p>
+            </div>
         </div>
 
         <div className="pdf">
