@@ -35,6 +35,39 @@ h1 {
   line-height: 1.1;
 }
 
+.design {
+  width: 60%;
+}
+
+.flex {
+  display: flex;
+}
+
+.explanation {
+  width: 100%;
+  padding: 1%;
+}
+
+.terms {
+  border: 1px solid gray;
+  height: 400px;
+  padding: 10px;
+}
+
+.pdf_viewer {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: scroll;
+  border: 1px solid black;
+}
+
+.color_of_li {
+  background-color: rgb(120, 217, 255);
+  border-radius: 3px;
+  padding: 5px;
+  width: 80%;
+}
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -42,7 +75,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #70ffe0;
   cursor: pointer;
   transition: border-color 0.25s;
 }

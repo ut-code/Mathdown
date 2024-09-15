@@ -19,7 +19,7 @@ $$
 
 */
 type markdown = string;
-type AvailableSyntaxes = 
+type AvailableSyntaxes =
   | "mathjs" // mathjs-powered simplified TeX
   | "math" // literal KaTeX
   | "unspecified"; // default value; (should be) impossible to reach
@@ -35,7 +35,7 @@ export function replaceExternalSyntax(m: markdown): markdown {
     ++lines;
     if (isBlockMode) {
       blockModeLines.push(line);
-    } else if (!line.startsWith("```")){
+    } else if (!line.startsWith("```")) {
       result += line + "\n";
     }
     if (line.startsWith("```")) {
