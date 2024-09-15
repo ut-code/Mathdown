@@ -48,7 +48,7 @@ export default function App() {
     let d = ExtractDefinitions(
       markdown + textAreaValue,
       opts.prefix,
-      opts.suffix
+      opts.suffix,
     );
     console.log(markdown + textAreaValue);
     const newd = new Map<string, string>();
@@ -141,7 +141,7 @@ export default function App() {
           <button
             onClick={() =>
               setTextAreaValue(
-                (textAreaValue) => textAreaValue + "\n" + inputValue
+                (textAreaValue) => textAreaValue + "\n" + inputValue,
               )
             }
             style={{
@@ -180,7 +180,7 @@ function ConvertMarkdown({
         // make sure ${word} is the first attribute of class; otherwise the word replacement below will fail.
         parsing[idx] = line.replaceAll(
           word,
-          `<span class="${word} underline">${word}</span>`
+          `<span class="${word} underline">${word}</span>`,
         );
       }
       idx++;

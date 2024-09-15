@@ -18,7 +18,7 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 
 // import { text } from "stream/consumers";
 // Set the worker source path for pdfjs
-pdfjs.GlobalWorkerOptions.workerSrc =  `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.mjs`;
 import Textarea from "@mui/joy/Textarea";
 
 type optsObject = { prefix: string; suffix: string };
@@ -59,7 +59,7 @@ export function ExtractPDF({
       cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`, // 文字のエンコーディングに関する設定
       cMapPacked: true,
     }),
-    []
+    [],
   );
 
   // ページ移動
@@ -119,7 +119,7 @@ export function ExtractPDF({
           </div>
           <div className="terms">
             <p>
-               {pageNumber}ページ目 （{numPages}頁中）
+              {pageNumber}ページ目 （{numPages}頁中）
             </p>
             <button disabled={pageNumber <= 1} onClick={goToPrevPage}>
               前ページ
@@ -132,22 +132,22 @@ export function ExtractPDF({
                 dictionary={ExtractDefinitions(
                   explanation,
                   opts.prefix,
-                  opts.suffix
+                  opts.suffix,
                 )} // ユーザー入力（暫定）から定義を抜き出している。
                 searchString={result.join("") || ""}
-                referedString = {result[pageNumber - 1]}
+                referedString={result[pageNumber - 1]}
               />
             </ul>
           </div>
           <div>
-              <Textarea
-                placeholder="解説をコピー"
-                minRows={14}
-                onChange={(e) => {
-                  setExplanation(e.target.value);
-                }}
-              />
-            </div>
+            <Textarea
+              placeholder="解説をコピー"
+              minRows={14}
+              onChange={(e) => {
+                setExplanation(e.target.value);
+              }}
+            />
+          </div>
         </div>
 
         <div className="pdf">
@@ -172,7 +172,7 @@ export function ExtractPDF({
 function ReferMap({
   dictionary,
   searchString,
-  referedString //  ある条件を満たす用語は、ブラウザ上で水色に変化する。
+  referedString, //  ある条件を満たす用語は、ブラウザ上で水色に変化する。
 }: {
   dictionary: Map<string, string>;
   searchString: string;
@@ -180,12 +180,12 @@ function ReferMap({
 }) {
   // Filter dictionary keys based on whether they are included in the search string
   const filteredKeys = Array.from(dictionary.keys()).filter((key) =>
-    searchString.includes(key)
+    searchString.includes(key),
   );
 
   // Map filtered keys to JSX elements
   const li = filteredKeys.map((key) => (
-    <li key={key} className={referedString.includes(key) ? "color_of_li": ""}>
+    <li key={key} className={referedString.includes(key) ? "color_of_li" : ""}>
       <Tippy
         content={
           <Markdown rehypePlugins={[rehypeKatex]} remarkPlugins={[remarkMath]}>

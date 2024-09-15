@@ -9,7 +9,7 @@
 export function ExtractDefinitions(
   userInput: string,
   prefix: string = "!define",
-  suffix: string = "!enddef"
+  suffix: string = "!enddef",
 ): Map<string, string> {
   const definitions = new Map<string, string>();
   // supports multi-key definition
