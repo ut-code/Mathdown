@@ -14,6 +14,7 @@ import Textarea from "@mui/joy/Textarea";
 
 import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
+import UploadMarkdown from "./uploadMarkdown";
 
 type positionInfo = null | { top: number; left: number };
 
@@ -33,13 +34,19 @@ export default function App() {
   const [textAreaValue, setTextAreaValue] = useState("");
   const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
 
+  const [fileContent, setFileContent] = useState<string>("");
+
   // get markdown
+  // useEffect(() => {
+    // fetch(markdownLink)
+      // .then((res) => res.text())
+      // .then((t) => setMarkdown(t))
+      // .catch((err) => console.error("Error fetching Hoge.md:", err));
+  // }, []);
+
   useEffect(() => {
-    fetch(markdownLink)
-      .then((res) => res.text())
-      .then((t) => setMarkdown(t))
-      .catch((err) => console.error("Error fetching Hoge.md:", err));
-  }, []);
+    setMarkdown(fileContent);
+  }, [fileContent])
 
   // use markdown (separation is necessary because it's async)
   useEffect(() => void insideUseEffect(), [markdown + textAreaValue]);
@@ -119,8 +126,23 @@ export default function App() {
     setIsTextAreaFocused(false);
   };
 
+  // ファイルを保存する
+  const saveFile = () => {
+    const blob = new Blob([markdown + textAreaValue], { type: ".md, text/markdown" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "hogehoge.md";
+    link.click();
+  };
+
   return (
     <>
+    <div>
+      <UploadMarkdown onFileContentChange={setFileContent} />
+      <button onClick={saveFile}>
+          Save
+        </button>
+    </div>
       <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
       <ExtractPDF pdfName={pdfFile} opts={opts} />
       {/* ドラッグして参照する部分 */}
