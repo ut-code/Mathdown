@@ -28,7 +28,7 @@ export default function App() {
 
   // ドラッグして直接参照できる機能の部分
   const [inputPosition, setInputPosition] = useState<positionInfo>(null); // ドラッグされた位置
-  const [selectedText, setSelectedText] = useState(""); // ドラッグされた文章
+  // const [selectedText, setSelectedText] = useState(""); // ドラッグされた文章 // ...unused
   const [inputValue, setInputValue] = useState("");
   const [textAreaValue, setTextAreaValue] = useState("");
   const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
@@ -84,7 +84,7 @@ export default function App() {
         const rect = range.getBoundingClientRect(); // DOMRect { x: 209.56666564941406, y: 167.25, width: 130.38333129882812, height: 29, top: 167.25, right: 339.9499969482422, bottom: 196.25, left: 209.56666564941406 }
         // 位置情報の取得
 
-        setSelectedText(selection.toString());
+        // setSelectedText(selection.toString()); // ...unused
 
         if (selection.toString()) {
           // console.log(selection.toString()) 選択した範囲の文字列。
@@ -219,8 +219,4 @@ function ConvertMarkdown({
   };
 
   return <>{parse(parsedHtml, options)}</>; // パースされた HTML を返す
-}
-function inspect<T>(target: T): T {
-  console.log(target);
-  return target;
 }
