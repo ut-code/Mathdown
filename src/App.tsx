@@ -38,15 +38,15 @@ export default function App() {
 
   // get markdown
   // useEffect(() => {
-    // fetch(markdownLink)
-      // .then((res) => res.text())
-      // .then((t) => setMarkdown(t))
-      // .catch((err) => console.error("Error fetching Hoge.md:", err));
+  // fetch(markdownLink)
+  // .then((res) => res.text())
+  // .then((t) => setMarkdown(t))
+  // .catch((err) => console.error("Error fetching Hoge.md:", err));
   // }, []);
 
   useEffect(() => {
     setMarkdown(fileContent);
-  }, [fileContent])
+  }, [fileContent]);
 
   // use markdown (separation is necessary because it's async)
   useEffect(() => void insideUseEffect(), [markdown + textAreaValue]);
@@ -128,7 +128,9 @@ export default function App() {
 
   // ファイルを保存する
   const saveFile = () => {
-    const blob = new Blob([markdown + textAreaValue], { type: ".md, text/markdown" });
+    const blob = new Blob([markdown + textAreaValue], {
+      type: ".md, text/markdown",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "hogehoge.md";
@@ -137,12 +139,10 @@ export default function App() {
 
   return (
     <>
-    <div>
-      <UploadMarkdown onFileContentChange={setFileContent} />
-      <button onClick={saveFile}>
-          Save
-        </button>
-    </div>
+      <div>
+        <UploadMarkdown onFileContentChange={setFileContent} />
+        <button onClick={saveFile}>Save</button>
+      </div>
       <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
       <ExtractPDF pdfName={pdfFile} opts={opts} />
       {/* ドラッグして参照する部分 */}

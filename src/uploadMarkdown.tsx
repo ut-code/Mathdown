@@ -4,13 +4,13 @@ import React, { InputHTMLAttributes, forwardRef } from "react";
 
 const TEXT_FILE_ID = "textFileId";
 type Props = {
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    id: InputHTMLAttributes<HTMLInputElement>["id"];
-  }; 
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  id: InputHTMLAttributes<HTMLInputElement>["id"];
+};
 
-  type MarkdownProps = {
-    onFileContentChange: (content: string) => void; // 親にデータを渡すためのProps
-  };
+type MarkdownProps = {
+  onFileContentChange: (content: string) => void; // 親にデータを渡すためのProps
+};
 
 export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
   const [textFile, setTextFile] = useState<File | null>(null);
@@ -53,16 +53,16 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
 
 // テキストファイル用の Input コンポーネント
 const InputMarkdown = forwardRef<HTMLInputElement, Props>(
-    ({ onChange, id }, ref) => {
-      return (
-        <input
-          ref={ref}
-          id={id}
-          type="file"
-          accept=".md, text/markdown"  // Markdownファイルを選択可能に
-          onChange={onChange}
-          hidden
-        />
-      );
-    }
-  );
+  ({ onChange, id }, ref) => {
+    return (
+      <input
+        ref={ref}
+        id={id}
+        type="file"
+        accept=".md, text/markdown" // Markdownファイルを選択可能に
+        onChange={onChange}
+        hidden
+      />
+    );
+  },
+);
