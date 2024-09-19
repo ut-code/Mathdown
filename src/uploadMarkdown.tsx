@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { Button, Typography } from "@mui/material";
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@mui/material";
 import React, { InputHTMLAttributes, forwardRef } from "react";
 
 const TEXT_FILE_ID = "textFileId";
@@ -16,6 +16,14 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
   const [textFile, setTextFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 初回ロード時に localStorage からデータを読み込む
+  useEffect(() => {
+    const storedText = localStorage.getItem('item');
+    if (storedText) {
+      onFileContentChange(storedText); // 親コンポーネントにデータを渡す
+    }
+  }, []);
+
   // ファイルが選択されたときの処理
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.currentTarget?.files && e.currentTarget.files[0]) {
@@ -26,10 +34,19 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const text = event.target?.result as string; // ファイル内容を状態に保存
-        onFileContentChange(text);
+        localStorage.setItem('item', text);
+        const storedText = localStorage.getItem('item') ?? "";
+        onFileContentChange(storedText);
+        console.log("Text saved:", storedText);
       };
       reader.readAsText(targetFile); // ファイルをテキストとして読み込む
     }
+  };
+
+  const deleteStoredText = () => {
+    localStorage.removeItem('item');
+    onFileContentChange(""); // 削除後、親コンポーネントに空データを渡す
+    console.log("Stored text deleted");
   };
 
   return (
@@ -46,6 +63,9 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
 
       <Button onClick={() => fileInputRef.current?.click()}>
         ファイルを選択
+      </Button>
+      <Button onClick={deleteStoredText}>
+        消去する
       </Button>
     </>
   );

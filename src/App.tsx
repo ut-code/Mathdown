@@ -4,13 +4,14 @@ import parse, { Element, HTMLReactParserOptions } from "html-react-parser";
 // import rehypeKatex from "rehype-katex";
 // import remarkMath from "remark-math";
 import Tippy from "@tippyjs/react";
-import markdownLink from "/hoge.md?url";
+// import markdownLink from "/hoge.md?url";
 import { ExtractDefinitions } from "./MDToDefinitions";
 import { MDToHTML } from "./MDToHTML";
 import { replaceExternalSyntax } from "./external-syntax";
 import { ExtractPDF } from "./extractPDF";
 import pdfFile from "/chibutsu_nyumon.pdf";
 import Textarea from "@mui/joy/Textarea";
+import { Button } from "@mui/material";
 
 import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
@@ -29,11 +30,10 @@ export default function App() {
 
   // ドラッグして直接参照できる機能の部分
   const [inputPosition, setInputPosition] = useState<positionInfo>(null); // ドラッグされた位置
-  const [selectedText, setSelectedText] = useState(""); // ドラッグされた文章
+  const [selectedText, setSelectedText] = useState(""); // ドラッグされた文章に関する変数
   const [inputValue, setInputValue] = useState("");
-  const [textAreaValue, setTextAreaValue] = useState("");
   const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
-
+  const [visualize, setVisualize] = useState(false); // テキストエリアを表示にするか非表示にするか
   const [fileContent, setFileContent] = useState<string>("");
 
   // get markdown
@@ -48,16 +48,15 @@ export default function App() {
     setMarkdown(fileContent);
   }, [fileContent]);
 
+  useEffect(() => {
+    localStorage.setItem('item', markdown);
+  }, [markdown]) // markdownの内容が変わるたびにlocalStorageに保存。
+
   // use markdown (separation is necessary because it's async)
-  useEffect(() => void insideUseEffect(), [markdown + textAreaValue]);
+  useEffect(() => void insideUseEffect(), [markdown]);
   async function insideUseEffect() {
     // prepare dictionary
-    let d = ExtractDefinitions(
-      markdown + textAreaValue,
-      opts.prefix,
-      opts.suffix,
-    );
-    console.log(markdown + textAreaValue);
+    let d = ExtractDefinitions(markdown, opts.prefix, opts.suffix);
     const newd = new Map<string, string>();
     const promises: Promise<Map<string, string>>[] = [];
     d.forEach((v, k) => {
@@ -71,7 +70,7 @@ export default function App() {
     // prepare HTML
     var md;
     try {
-      md = replaceExternalSyntax(markdown);
+      md = replaceExternalSyntax(markdown.replace(/!define[\s\S]*$/m, '')); // !define以下をすべて取り去る。
     } catch (e: any) {
       md = e.toString();
     }
@@ -128,7 +127,7 @@ export default function App() {
 
   // ファイルを保存する
   const saveFile = () => {
-    const blob = new Blob([markdown + textAreaValue], {
+    const blob = new Blob([markdown], {
       type: ".md, text/markdown",
     });
     const link = document.createElement("a");
@@ -141,12 +140,47 @@ export default function App() {
     <>
       <div>
         <UploadMarkdown onFileContentChange={setFileContent} />
-        <button onClick={saveFile}>Save</button>
+        <Button variant="text" onClick={saveFile}>
+          保存
+        </Button>
       </div>
       <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
+      {visualize == false && (
+        <div>
+          <Button
+            variant="text"
+            onClick={() => {
+              setVisualize(true);
+            }}
+          >
+            編集画面の表示
+          </Button>
+        </div>
+      )}
+      {visualize == true && (
+        <>
+          <div>
+            <Button
+              variant="text"
+              onClick={() => {
+                setVisualize(false);
+              }}
+            >
+              編集画面の非表示
+            </Button>
+          </div>
+          <Textarea
+            value={markdown}
+            onChange={(event) => {
+              setMarkdown(event.target.value);
+            }}
+            placeholder="編集画面"
+            minRows={10}
+          />
+        </>
+      )}
       <ExtractPDF pdfName={pdfFile} opts={opts} />
       {/* ドラッグして参照する部分 */}
-      <Textarea value={textAreaValue} placeholder="結果" minRows={10} />
       {inputPosition && (
         <>
           <Textarea
@@ -162,9 +196,7 @@ export default function App() {
           />
           <button
             onClick={() =>
-              setTextAreaValue(
-                (textAreaValue) => textAreaValue + "\n" + inputValue,
-              )
+              setMarkdown((markdown) => markdown + "\n" + inputValue + "\n")
             }
             style={{
               position: "absolute",
@@ -191,6 +223,10 @@ function ConvertMarkdown({
   opts: { prefix: string; suffix: string };
 }) {
   let parsing = html.split("\n");
+
+  dictionary = new Map(
+    [...dictionary.entries()].sort((a, b) => a[0].length - b[0].length),
+  ); // 短い単語を先に置き換える: 辞書内の単語を長さ順にソートしてから置き換えることで、重複のリスクを減らします。
 
   // this is O(n**2). reduce the order if you can.
   dictionary.forEach((_def: string, word: string) => {
