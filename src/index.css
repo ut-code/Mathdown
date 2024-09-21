@@ -91,3 +91,44 @@ button:focus-visible {
   border-bottom: 1.5px dotted rgb(0, 144, 19);
   display: inline-block;
 }
+
+.wrapper_true {
+  display: flex;
+  width: 100%;
+}
+
+.wrapper_true div {
+  width: 49%;
+  margin: 0.5%;
+  height: 660px;
+  border: 1px solid black;
+  border-radius: 3px;
+  overflow: scroll;
+}
+
+.convert_markdown {
+  padding: 1%;
+}
+
+.wrapper_true textarea {
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+}
+
+.wrapper_false {
+  margin: 0.5%;
+  padding: 1%;
+  height: 660px;
+  border: 1px solid black;
+  border-radius: 3px;
+  overflow: scroll;
+}
+
+.upload_save {
+  display: inline;
+  border: 1px solid black;
+  border-radius: 3px;
+  margin: 3px;
+  padding: 10px;
+}

@@ -33,7 +33,7 @@ export default function App() {
   const [selectedText, setSelectedText] = useState(""); // ドラッグされた文章に関する変数
   const [inputValue, setInputValue] = useState("");
   const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
-  const [visualize, setVisualize] = useState(false); // テキストエリアを表示にするか非表示にするか
+  const [visualize, setVisualize] = useState(true); // テキストエリアを表示にするか非表示にするか
   const [fileContent, setFileContent] = useState<string>("");
 
   // get markdown
@@ -49,8 +49,8 @@ export default function App() {
   }, [fileContent]);
 
   useEffect(() => {
-    localStorage.setItem('item', markdown);
-  }, [markdown]) // markdownの内容が変わるたびにlocalStorageに保存。
+    localStorage.setItem("item", markdown);
+  }, [markdown]); // markdownの内容が変わるたびにlocalStorageに保存。
 
   // use markdown (separation is necessary because it's async)
   useEffect(() => void insideUseEffect(), [markdown]);
@@ -70,7 +70,7 @@ export default function App() {
     // prepare HTML
     var md;
     try {
-      md = replaceExternalSyntax(markdown.replace(/!define[\s\S]*$/m, '')); // !define以下をすべて取り去る。
+      md = replaceExternalSyntax(markdown.replace(/!define[\s\S]*$/m, "")); // !define以下をすべて取り去る。
     } catch (e: any) {
       md = e.toString();
     }
@@ -132,19 +132,18 @@ export default function App() {
     });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "hogehoge.md";
+    link.download = localStorage.getItem("filename") ?? "hoge.md"; // localStorage上に保存したファイル名を使う。
     link.click();
   };
 
   return (
     <>
-      <div>
+      <div className="upload_save">
         <UploadMarkdown onFileContentChange={setFileContent} />
         <Button variant="text" onClick={saveFile}>
           保存
         </Button>
       </div>
-      <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
       {visualize == false && (
         <div>
           <Button
@@ -155,6 +154,7 @@ export default function App() {
           >
             編集画面の表示
           </Button>
+          <div className="wrapper_false"><ConvertMarkdown dictionary={dict} html={html} opts={opts} /></div>
         </div>
       )}
       {visualize == true && (
@@ -169,14 +169,18 @@ export default function App() {
               編集画面の非表示
             </Button>
           </div>
-          <Textarea
-            value={markdown}
-            onChange={(event) => {
-              setMarkdown(event.target.value);
-            }}
-            placeholder="編集画面"
-            minRows={10}
-          />
+          <div className="wrapper_true">
+            <div className="convert_markdown">
+              <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
+            </div>
+            <div><textarea
+              value={markdown}
+              onChange={(event) => {
+                setMarkdown(event.target.value);
+              }}
+              placeholder="編集画面"
+            /></div>
+          </div>
         </>
       )}
       <ExtractPDF pdfName={pdfFile} opts={opts} />

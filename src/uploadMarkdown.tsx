@@ -19,6 +19,7 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
   // 初回ロード時に localStorage からデータを読み込む
   useEffect(() => {
     const storedText = localStorage.getItem('item');
+    const fileName = localStorage.getItem('filename');
     if (storedText) {
       onFileContentChange(storedText); // 親コンポーネントにデータを渡す
     }
@@ -29,6 +30,7 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
     if (e.currentTarget?.files && e.currentTarget.files[0]) {
       const targetFile = e.currentTarget.files[0];
       setTextFile(targetFile);
+      localStorage.setItem('filename', targetFile.name); // ファイル名を保存 -> ファイルを新規保存する際に使う。
 
       // FileReaderを使ってファイルの内容を読み込む
       const reader = new FileReader();
@@ -52,7 +54,7 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
   return (
     <>
       <label>
-        + テキストファイルをアップロード
+        テキストファイルをアップロード
         {/* 見えないinput要素 */}
         <InputMarkdown
           ref={fileInputRef}
