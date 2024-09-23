@@ -145,21 +145,21 @@ export default function App() {
         </Button>
       </div>
       {visualize == false && (
-        <div>
-          <Button
+        <>
+          <div className="upload_save"><Button
             variant="text"
             onClick={() => {
               setVisualize(true);
             }}
           >
             編集画面の表示
-          </Button>
+          </Button></div>
           <div className="wrapper_false"><ConvertMarkdown dictionary={dict} html={html} opts={opts} /></div>
-        </div>
+        </>
       )}
       {visualize == true && (
         <>
-          <div>
+          <div className="upload_save">
             <Button
               variant="text"
               onClick={() => {
@@ -173,13 +173,13 @@ export default function App() {
             <div className="convert_markdown">
               <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
             </div>
-            <div><textarea
+            <textarea
               value={markdown}
               onChange={(event) => {
                 setMarkdown(event.target.value);
               }}
               placeholder="編集画面"
-            /></div>
+            />
           </div>
         </>
       )}

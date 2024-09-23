@@ -14,6 +14,10 @@
   -webkit-text-size-adjust: 100%;
 }
 
+#root {
+  width: 100%;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -98,21 +102,20 @@ button:focus-visible {
 }
 
 .wrapper_true div {
-  width: 49%;
+  width: 47%;
   margin: 0.5%;
+  padding: 1%;
   height: 660px;
   border: 1px solid black;
   border-radius: 3px;
   overflow: scroll;
 }
 
-.convert_markdown {
-  padding: 1%;
-}
-
 .wrapper_true textarea {
-  width: 100%;
-  height: 100%;
+  width: 47%;
+  height: 660px;
+  margin: 0.5%;
+  padding: 1%;
   font-family: inherit;
 }
 
@@ -129,6 +132,6 @@ button:focus-visible {
   display: inline;
   border: 1px solid black;
   border-radius: 3px;
-  margin: 3px;
+  margin: 10px;
   padding: 10px;
 }
