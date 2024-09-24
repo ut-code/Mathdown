@@ -270,7 +270,7 @@ function ConvertMarkdown({
       ) {
         return (
           // dictionary.get(word) is an html and therefore must not be used directly
-          <Tippy content={parse(dictionary.get(word) || "")}>
+          <Tippy content={parse(dictionary.get(word) || "")} className="markdown_tippy">
             <span className={newClass}>{word}</span>
           </Tippy>
         );
