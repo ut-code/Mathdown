@@ -16,6 +16,7 @@ import { Button } from "@mui/material";
 import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
 import UploadMarkdown from "./uploadMarkdown";
+import UploadImage from "./uploadImage";
 
 type positionInfo = null | { top: number; left: number };
 
@@ -35,6 +36,7 @@ export default function App() {
   const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
   const [visualize, setVisualize] = useState(true); // テキストエリアを表示にするか非表示にするか
   const [fileContent, setFileContent] = useState<string>("");
+  const [imageData, setImageData] = useState<string>("");
 
   // get markdown
   // useEffect(() => {
@@ -117,6 +119,10 @@ export default function App() {
     // console.log(inputValue) 入力された内容がここに入る。
   };
 
+  const handleImageChange = (content: string) => {
+    setImageData(content);
+  };
+
   const handleTextAreaFocus = () => {
     setIsTextAreaFocused(true);
   };
@@ -125,7 +131,7 @@ export default function App() {
     setIsTextAreaFocused(false);
   };
 
-  // ファイルを保存する
+  // テキストファイルを保存する
   const saveFile = () => {
     const blob = new Blob([markdown], {
       type: ".md, text/markdown",
@@ -138,25 +144,35 @@ export default function App() {
 
   return (
     <>
-      <div className="upload_save">
-        <UploadMarkdown onFileContentChange={setFileContent} />
-        <Button variant="text" onClick={saveFile}>
-          保存
-        </Button>
+      <div className="save_container">
+        <div className="upload_save">
+          <UploadMarkdown onFileContentChange={setFileContent} />
+          <Button variant="text" onClick={saveFile}>
+            保存
+          </Button>
+        </div>
+        <div className="upload_save">
+          <UploadImage onImageChange={handleImageChange} />
+        </div>
       </div>
       {visualize == false && (
         <>
-          <div className="upload_save"><Button
-            variant="text"
-            onClick={() => {
-              setVisualize(true);
-            }}
-          >
-            編集画面の表示
-          </Button></div>
-          <div className="wrapper_false"><ConvertMarkdown dictionary={dict} html={html} opts={opts} /></div>
+          <div className="upload_save">
+            <Button
+              variant="text"
+              onClick={() => {
+                setVisualize(true);
+              }}
+            >
+              編集画面の表示
+            </Button>
+          </div>
+          <div className="wrapper_false">
+            <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
+          </div>
         </>
       )}
+      <div>{imageData}</div>
       {visualize == true && (
         <>
           <div className="upload_save">
@@ -218,6 +234,7 @@ export default function App() {
 
 // this uses given dictionary as the source to extract definition from,
 // and given html to render the main note.
+
 function ConvertMarkdown({
   dictionary,
   html,
@@ -230,16 +247,14 @@ function ConvertMarkdown({
 
   dictionary = new Map(
     [...dictionary.entries()].sort((a, b) => a[0].length - b[0].length),
-  ); // 短い単語を先に置き換える: 辞書内の単語を長さ順にソートしてから置き換えることで、重複のリスクを減らします。
+  ); // Sort dictionary entries by word length to avoid overlapping replacements
 
-  // this is O(n**2). reduce the order if you can.
+  // Replace words with tooltip-enabled spans
   dictionary.forEach((_def: string, word: string) => {
     let idx = 0;
     for (const line of parsing) {
-      // remove popup of the definition itself, because it looks ugly
-      // I hard-coded the assumption that a definition will turn into h2. if you got any better way to do this, do that.
+      // Skip lines that are part of the definition to avoid replacing inside the definition itself
       if (!line.includes(`<h2>${word}</h2>`)) {
-        // make sure ${word} is the first attribute of class; otherwise the word replacement below will fail.
         parsing[idx] = line.replaceAll(
           word,
           `<span class="${word} underline">${word}</span>`,
@@ -248,6 +263,7 @@ function ConvertMarkdown({
       idx++;
     }
   });
+
   let parsedHtml = parsing.join("\n");
 
   const options: HTMLReactParserOptions = {
@@ -255,34 +271,43 @@ function ConvertMarkdown({
       if (!(domNode instanceof Element)) {
         return domNode;
       }
-      // domNode の最初の class 属性を取り出す。 (indexError でなく undefined になるため、[0] は安全)
+
+      const tagName = domNode.tagName;
+
+      // Handle images
+      if (tagName === "img") {
+        const src = domNode.attribs?.src;
+        const alt = domNode.attribs?.alt;
+        return (
+          <img src={src} alt={alt || "image"} style={{ maxWidth: "100%" }} />
+        );
+      }
+
       const word: string | undefined = domNode.attribs?.class?.split(" ")[0];
-      // HTML 的には多分動くが、気持ち悪いので最初の class 属性 = word を排除
       const newClass: string = domNode.attribs?.class
         ?.split(" ")
         .slice(0)
         .join(" ");
-      // 与えられたノードが Element であり、その class 属性が undefined または空文字列でなく、 dictionary 内のいずれかの単語と一致するかどうかを確認
+
+      // Handle words that should show tooltips
       if (
         domNode instanceof Element &&
         domNode.attribs?.class &&
         dictionary.has(word)
       ) {
         return (
-          // dictionary.get(word) is an html and therefore must not be used directly
-          <Tippy content={parse(dictionary.get(word) || "")} className="markdown_tippy">
+          <Tippy
+            content={parse(dictionary.get(word) || "")}
+            className="markdown_tippy"
+          >
             <span className={newClass}>{word}</span>
           </Tippy>
         );
       }
-      // 条件を満たさない場合は、元のノードをそのまま返す
-      return domNode;
+
+      return domNode; // Return the domNode unchanged if no special handling is needed
     },
   };
 
-  return <>{parse(parsedHtml, options)}</>; // パースされた HTML を返す
-}
-function inspect<T>(target: T): T {
-  console.log(target);
-  return target;
+  return <>{parse(parsedHtml, options)}</>; // Parse the modified HTML with the options
 }

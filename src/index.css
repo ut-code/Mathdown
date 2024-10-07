@@ -136,6 +136,10 @@ button:focus-visible {
   padding: 10px;
 }
 
+.save_container {
+  display: flex;
+}
+
 .convert_markdown img {
   max-width: 100%;
 }
