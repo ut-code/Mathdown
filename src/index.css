@@ -14,6 +14,10 @@
   -webkit-text-size-adjust: 100%;
 }
 
+#root {
+  width: 100%;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -90,4 +94,56 @@ button:focus-visible {
 .underline {
   border-bottom: 1.5px dotted rgb(0, 144, 19);
   display: inline-block;
+}
+
+.wrapper_true {
+  display: flex;
+  width: 100%;
+}
+
+.wrapper_true div {
+  width: 47%;
+  margin: 0.5%;
+  padding: 1%;
+  height: 660px;
+  border: 1px solid black;
+  border-radius: 3px;
+  overflow: scroll;
+}
+
+.wrapper_true textarea {
+  width: 47%;
+  height: 660px;
+  margin: 0.5%;
+  padding: 1%;
+  font-family: inherit;
+}
+
+.wrapper_false {
+  margin: 0.5%;
+  padding: 1%;
+  height: 660px;
+  border: 1px solid black;
+  border-radius: 3px;
+  overflow: scroll;
+}
+
+.upload_save {
+  display: inline;
+  border: 1px solid black;
+  border-radius: 3px;
+  margin: 10px;
+  padding: 10px;
+}
+
+.save_container {
+  display: flex;
+}
+
+.convert_markdown img {
+  max-width: 100%;
+}
+
+.markdown_tippy img {
+  max-width: 320px;
 }
