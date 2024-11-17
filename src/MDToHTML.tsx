@@ -1,6 +1,6 @@
 import { unified } from "unified";
 import remarkParse from "remark-parse";
-import remarkHtml from "remark-html";
+import remarkGfm from "remark-gfm"
 import remarkRehype from "remark-rehype";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
@@ -12,6 +12,7 @@ export async function MDToHTML(md: string): Promise<string> {
       .use(remarkParse)
       .use(remarkMath)
       .use(remarkRehype)
+      .use(remarkGfm)
       .use(rehypeKatex)
       .use(rehypeStringify)
       .process(md),

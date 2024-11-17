@@ -13,7 +13,7 @@ type ImageUploadProps = {
 };
 
 export default function UploadImage({ onImageChange }: ImageUploadProps) {
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 初回ロード時に localStorage から画像データを読み込む

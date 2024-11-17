@@ -36,7 +36,7 @@ export function ExtractPDF({
 }) {
   const [numPages, setNumPages] = useState<number>(-1);
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [hogeMd, setHogeMd] = useState("");
+  const [,setHogeMd] = useState("");
   const [result, setResult] = useState<string[]>([]);
   const [explanation, setExplanation] = useState<string>(""); // ユーザー入力の部分。今は暫定的にテキストエリアを置いている。
 

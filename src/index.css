@@ -96,6 +96,20 @@ button:focus-visible {
   display: inline-block;
 }
 
+table {
+  border: 1px solid black;
+}
+
+th {
+  border: 1px solid black;
+  padding: 3px;
+}
+
+td  {
+  border: 1px solid black;
+  padding: 3px;
+}
+
 .wrapper_true {
   display: flex;
   width: 100%;
