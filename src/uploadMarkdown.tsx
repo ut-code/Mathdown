@@ -13,13 +13,12 @@ type MarkdownProps = {
 };
 
 export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
-  const [textFile, setTextFile] = useState<File | null>(null);
+  const [, setTextFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 初回ロード時に localStorage からデータを読み込む
   useEffect(() => {
     const storedText = localStorage.getItem('item');
-    const fileName = localStorage.getItem('filename');
     if (storedText) {
       onFileContentChange(storedText); // 親コンポーネントにデータを渡す
     }
