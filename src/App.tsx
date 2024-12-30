@@ -146,7 +146,7 @@ export default function App() {
       <div className="save_container">
         <div className="upload_save">
           <UploadMarkdown onFileContentChange={setFileContent} />
-          <Button variant="contained" onClick={saveFile} color="success">
+          <Button variant="text" onClick={saveFile} color="success">
             保存
           </Button>
         </div>
@@ -158,7 +158,7 @@ export default function App() {
         <>
         <div className="upload_save">
             <Button
-              variant="contained"
+              variant="text"
               onClick={() => {
                 setVisualize(true);
               }}
@@ -176,7 +176,7 @@ export default function App() {
         <>
           <div className="upload_save">
             <Button
-              variant="contained"
+              variant="text"
               onClick={() => {
                 setVisualize(false);
               }}
