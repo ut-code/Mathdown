@@ -146,7 +146,7 @@ export default function App() {
       <div className="save_container">
         <div className="upload_save">
           <UploadMarkdown onFileContentChange={setFileContent} />
-          <Button variant="text" onClick={saveFile}>
+          <Button variant="text" onClick={saveFile} color="success">
             保存
           </Button>
         </div>
@@ -156,13 +156,13 @@ export default function App() {
       </div>
       {visualize == false && (
         <>
-          <div className="upload_save">
+        <div className="upload_save">
             <Button
               variant="text"
               onClick={() => {
                 setVisualize(true);
               }}
-            >
+              color="success">
               編集画面の表示
             </Button>
           </div>
@@ -180,7 +180,7 @@ export default function App() {
               onClick={() => {
                 setVisualize(false);
               }}
-            >
+              color="success">
               編集画面の非表示
             </Button>
           </div>
