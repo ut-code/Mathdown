@@ -63,10 +63,10 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
         />
       </label>
 
-      <Button onClick={() => fileInputRef.current?.click()}>
+      <Button variant="contained" onClick={() => fileInputRef.current?.click()} color="success">
         ファイルを選択
       </Button>
-      <Button onClick={deleteStoredText}>
+      <Button variant="contained" onClick={deleteStoredText} color="success">
         消去する
       </Button>
     </>

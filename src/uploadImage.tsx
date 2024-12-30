@@ -60,10 +60,10 @@ export default function UploadImage({ onImageChange }: ImageUploadProps) {
         />
       </label>
 
-      <Button onClick={() => fileInputRef.current?.click()}>
+      <Button variant="contained" onClick={() => fileInputRef.current?.click()}color="success">
         ファイルを選択
       </Button>
-      <Button onClick={deleteStoredImage}>
+      <Button variant="contained" onClick={deleteStoredImage} color="success">
         消去する
       </Button>
     </>
