@@ -36,7 +36,7 @@ export function ExtractPDF({
 }) {
   const [numPages, setNumPages] = useState<number>(-1);
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [,setHogeMd] = useState("");
+  const [, setHogeMd] = useState("");
   const [result, setResult] = useState<string[]>([]);
   const [explanation, setExplanation] = useState<string>(""); // ユーザー入力の部分。今は暫定的にテキストエリアを置いている。
 
@@ -77,7 +77,7 @@ export function ExtractPDF({
 
   // pdfから文字を抜き出す非同期関数
   async function extractTextFromPDF(pdf: pdfType) {
-    let resultContent: any[] = [];
+    const resultContent: any[] = [];
     const getPageText = async (pageNum: number) => {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent(); // console.log(textContent.items); をしてみると良い。

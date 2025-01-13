@@ -42,7 +42,9 @@ export default function App() {
       const d = ExtractDefinitions(markdown, opts.prefix, opts.suffix);
       const newd = new Map<string, string>();
       const promises = Array.from(d.entries()).map(([k, v]) => {
-        let md = replaceExternalSyntax(v).replaceAll(opts.prefix, "##").replaceAll(opts.suffix, "");
+        const md = replaceExternalSyntax(v)
+          .replaceAll(opts.prefix, "##")
+          .replaceAll(opts.suffix, "");
         return MDToHTML(md).then((newv) => newd.set(k, newv));
       });
       await Promise.all(promises);
@@ -81,14 +83,20 @@ export default function App() {
       }
     };
     document.addEventListener("selectionchange", handleSelectionChange);
-    return () => document.removeEventListener("selectionchange", handleSelectionChange);
+    return () =>
+      document.removeEventListener("selectionchange", handleSelectionChange);
   }, [isTextAreaFocused]);
 
-  const handleInputChange = (event: { target: { value: SetStateAction<string> } }) => {
+  const handleInputChange = (event: {
+    target: { value: SetStateAction<string> };
+  }) => {
     setInputValue(event.target.value);
   };
 
-  const handleScrollSync = (sourceRef: React.RefObject<HTMLElement>, targetRef: React.RefObject<HTMLElement>) => {
+  const handleScrollSync = (
+    sourceRef: React.RefObject<HTMLElement>,
+    targetRef: React.RefObject<HTMLElement>,
+  ) => {
     if (sourceRef.current && targetRef.current) {
       targetRef.current.scrollTop = sourceRef.current.scrollTop;
     }
@@ -121,7 +129,9 @@ export default function App() {
       <div className="save_container">
         <div className="upload_save">
           <UploadMarkdown onFileContentChange={setFileContent} />
-          <Button variant="text" onClick={saveFile}>保存</Button>
+          <Button variant="text" onClick={saveFile}>
+            保存
+          </Button>
         </div>
         <div className="upload_save">
           <UploadImage onImageChange={setImageData} />
@@ -130,7 +140,9 @@ export default function App() {
       {!visualize && (
         <>
           <div className="upload_save">
-            <Button variant="text" onClick={() => setVisualize(true)}>編集画面の表示</Button>
+            <Button variant="text" onClick={() => setVisualize(true)}>
+              編集画面の表示
+            </Button>
           </div>
           <div className="wrapper_false">
             <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
@@ -141,12 +153,26 @@ export default function App() {
       {visualize && (
         <>
           <div className="upload_save">
-            <Button variant="text" onClick={() => setVisualize(false)}>編集画面の非表示</Button>
+            <Button variant="text" onClick={() => setVisualize(false)}>
+              編集画面の非表示
+            </Button>
           </div>
-          <button onClick={() => insertDollarSignsAtCursor("\\int_a^b dx")}>積分記号</button>
-          <button onClick={() => insertDollarSignsAtCursor("\\frac{\\partial}{\\partial x}")}>偏微分</button>
+          <button onClick={() => insertDollarSignsAtCursor("\\int_a^b dx")}>
+            積分記号
+          </button>
+          <button
+            onClick={() =>
+              insertDollarSignsAtCursor("\\frac{\\partial}{\\partial x}")
+            }
+          >
+            偏微分
+          </button>
           <div className="wrapper_true">
-            <div className="convert_markdown" ref={previewRef} onScroll={() => handleScrollSync(previewRef, textAreaRef)}>
+            <div
+              className="convert_markdown"
+              ref={previewRef}
+              onScroll={() => handleScrollSync(previewRef, textAreaRef)}
+            >
               <ConvertMarkdown dictionary={dict} html={html} opts={opts} />
             </div>
             <textarea
@@ -168,13 +194,23 @@ export default function App() {
           <Textarea
             value={inputValue}
             onChange={handleInputChange}
-            style={{ position: "absolute", top: `${inputPosition.top}px`, left: `${inputPosition.left}px` }}
+            style={{
+              position: "absolute",
+              top: `${inputPosition.top}px`,
+              left: `${inputPosition.left}px`,
+            }}
             onFocus={() => setIsTextAreaFocused(true)}
             onBlur={() => setIsTextAreaFocused(false)}
           />
           <button
-            onClick={() => setMarkdown((markdown) => markdown + "\n" + inputValue + "\n")}
-            style={{ position: "absolute", top: `${inputPosition.top - 1}px`, left: `${inputPosition.left + 250}px` }}
+            onClick={() =>
+              setMarkdown((markdown) => markdown + "\n" + inputValue + "\n")
+            }
+            style={{
+              position: "absolute",
+              top: `${inputPosition.top - 1}px`,
+              left: `${inputPosition.left + 250}px`,
+            }}
           >
             送信
           </button>
@@ -184,12 +220,28 @@ export default function App() {
   );
 }
 
-function ConvertMarkdown({ dictionary, html, opts }: { dictionary: Map<string, string>; html: string; opts: { prefix: string; suffix: string }; }) {
+function ConvertMarkdown({
+  dictionary,
+  html,
+}: {
+  dictionary: Map<string, string>;
+  html: string;
+  opts: { prefix: string; suffix: string };
+}) {
   let parsing = html.split("\n");
-  dictionary = new Map([...dictionary.entries()].sort((a, b) => a[0].length - b[0].length));
+  dictionary = new Map(
+    [...dictionary.entries()].sort((a, b) => a[0].length - b[0].length),
+  );
 
   dictionary.forEach((_, word) => {
-    parsing = parsing.map(line => !line.includes(`<h2>${word}</h2>`) ? line.replaceAll(word, `<span class="${word} underline">${word}</span>`) : line);
+    parsing = parsing.map((line) =>
+      !line.includes(`<h2>${word}</h2>`)
+        ? line.replaceAll(
+            word,
+            `<span class="${word} underline">${word}</span>`,
+          )
+        : line,
+    );
   });
 
   const parsedHtml = parsing.join("\n");
@@ -199,12 +251,21 @@ function ConvertMarkdown({ dictionary, html, opts }: { dictionary: Map<string, s
       if (domNode instanceof Element) {
         const tagName = domNode.tagName;
         if (tagName === "img") {
-          return <img src={domNode.attribs?.src} alt={domNode.attribs?.alt || "image"} style={{ maxWidth: "100%" }} />;
+          return (
+            <img
+              src={domNode.attribs?.src}
+              alt={domNode.attribs?.alt || "image"}
+              style={{ maxWidth: "100%" }}
+            />
+          );
         }
         const word = domNode.attribs?.class?.split(" ")[0];
         if (dictionary.has(word)) {
           return (
-            <Tippy content={parse(dictionary.get(word) || "")} className="markdown_tippy">
+            <Tippy
+              content={parse(dictionary.get(word) || "")}
+              className="markdown_tippy"
+            >
               <span className={domNode.attribs?.class}>{word}</span>
             </Tippy>
           );

@@ -18,7 +18,7 @@ export default function UploadImage({ onImageChange }: ImageUploadProps) {
 
   // 初回ロード時に localStorage から画像データを読み込む
   useEffect(() => {
-    const storedImage = localStorage.getItem('image');
+    const storedImage = localStorage.getItem("image");
     if (storedImage) {
       onImageChange(storedImage); // 親コンポーネントに画像データを渡す
     }
@@ -34,7 +34,7 @@ export default function UploadImage({ onImageChange }: ImageUploadProps) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const imageData = event.target?.result as string; // Base64エンコードされた画像データを取得
-        localStorage.setItem('image', imageData); // localStorageに画像データを保存
+        localStorage.setItem("image", imageData); // localStorageに画像データを保存
         onImageChange(imageData); // 親コンポーネントに画像データを渡す
         console.log("Image saved:", imageData);
       };
@@ -43,7 +43,7 @@ export default function UploadImage({ onImageChange }: ImageUploadProps) {
   };
 
   const deleteStoredImage = () => {
-    localStorage.removeItem('image');
+    localStorage.removeItem("image");
     onImageChange(""); // 削除後、親コンポーネントに空データを渡す
     console.log("Stored image deleted");
   };
@@ -63,9 +63,7 @@ export default function UploadImage({ onImageChange }: ImageUploadProps) {
       <Button onClick={() => fileInputRef.current?.click()}>
         ファイルを選択
       </Button>
-      <Button onClick={deleteStoredImage}>
-        消去する
-      </Button>
+      <Button onClick={deleteStoredImage}>消去する</Button>
     </>
   );
 }
@@ -85,3 +83,7 @@ const InputImage = forwardRef<HTMLInputElement, Props>(
     );
   },
 );
+
+
+// displayNameを追加
+InputImage.displayName = "InputImage";
