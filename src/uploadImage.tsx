@@ -84,6 +84,5 @@ const InputImage = forwardRef<HTMLInputElement, Props>(
   },
 );
 
-
 // displayNameを追加
 InputImage.displayName = "InputImage";
