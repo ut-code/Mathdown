@@ -13,12 +13,13 @@ type MarkdownProps = {
 };
 
 export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
-  const [, setTextFile] = useState<File | null>(null);
+  const [textFile, setTextFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 初回ロード時に localStorage からデータを読み込む
   useEffect(() => {
-    const storedText = localStorage.getItem("item");
+    const storedText = localStorage.getItem('item');
+    const fileName = localStorage.getItem('filename');
     if (storedText) {
       onFileContentChange(storedText); // 親コンポーネントにデータを渡す
     }
@@ -29,14 +30,14 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
     if (e.currentTarget?.files && e.currentTarget.files[0]) {
       const targetFile = e.currentTarget.files[0];
       setTextFile(targetFile);
-      localStorage.setItem("filename", targetFile.name); // ファイル名を保存 -> ファイルを新規保存する際に使う。
+      localStorage.setItem('filename', targetFile.name); // ファイル名を保存 -> ファイルを新規保存する際に使う。
 
       // FileReaderを使ってファイルの内容を読み込む
       const reader = new FileReader();
       reader.onload = (event) => {
         const text = event.target?.result as string; // ファイル内容を状態に保存
-        localStorage.setItem("item", text);
-        const storedText = localStorage.getItem("item") ?? "";
+        localStorage.setItem('item', text);
+        const storedText = localStorage.getItem('item') ?? "";
         onFileContentChange(storedText);
         console.log("Text saved:", storedText);
       };
@@ -45,7 +46,7 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
   };
 
   const deleteStoredText = () => {
-    localStorage.removeItem("item");
+    localStorage.removeItem('item');
     onFileContentChange(""); // 削除後、親コンポーネントに空データを渡す
     console.log("Stored text deleted");
   };
@@ -65,7 +66,9 @@ export default function UploadMarkdown({ onFileContentChange }: MarkdownProps) {
       <Button onClick={() => fileInputRef.current?.click()}>
         ファイルを選択
       </Button>
-      <Button onClick={deleteStoredText}>消去する</Button>
+      <Button onClick={deleteStoredText}>
+        消去する
+      </Button>
     </>
   );
 }
@@ -85,6 +88,3 @@ const InputMarkdown = forwardRef<HTMLInputElement, Props>(
     );
   },
 );
-
-// displayNameを追加
-InputMarkdown.displayName = "InputMarkdown";

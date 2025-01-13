@@ -92,6 +92,12 @@ type tex = string;
 function MathJS(m: mathjs): tex {
   return "```math\n" + math.parse(m).toTex() + "\n```\n";
 }
-function KaTeX(b: string): tex {
+function KaTeX(b: block): tex {
   return "```math\n" + b + "\n```\n";
+}
+
+function assert(b: bool, text: string = "Explicit assertion failed.") {
+  if (!b) {
+    throw new Error(text);
+  }
 }
