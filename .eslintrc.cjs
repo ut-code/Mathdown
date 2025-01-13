@@ -27,5 +27,8 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "react"],
   ignorePatterns: ["/dist/*"],
-  rules: {},
+  rules: {
+    'react/react-in-jsx-scope': 'off', // React 17+ ではJSXトランスフォームが不要
+    '@typescript-eslint/no-explicit-any': 'warn', // any型の使用を警告（エラーにしたい場合は`error`）
+  },
 };
