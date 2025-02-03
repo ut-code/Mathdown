@@ -29,6 +29,19 @@ export default function App() {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
+  // 2/3追加・テンプレート部分
+
+  const [buttonName, setButtonName] = useState<string[]>([
+    "積分記号",
+    "偏微分",
+  ]);
+  const [buttonContent, setButtonContent] = useState<string[]>([
+    "\\int_a^b dx",
+    "\\frac{\\partial}{\\partial x}",
+  ]);
+  const [nameText, setNameText] = useState<string>("");
+  const [contentText, setContentText] = useState<string>("");
+
   useEffect(() => {
     setMarkdown(fileContent);
   }, [fileContent]);
@@ -157,16 +170,45 @@ export default function App() {
               編集画面の非表示
             </Button>
           </div>
-          <button onClick={() => insertDollarSignsAtCursor("\\int_a^b dx")}>
-            積分記号
-          </button>
+
+          {/* 2/3追加 テンプレート部 */}
+          {buttonName.map((name, index) => (
+            <>
+              <button
+                onClick={() => insertDollarSignsAtCursor(buttonContent[index])}
+              >
+                {name}
+              </button>
+              <button
+                onClick={() => {
+                  setButtonName(buttonName.filter((_, i) => i !== index));
+                  setButtonContent(buttonContent.filter((_, i) => i !== index));
+                }}
+              >
+                削除
+              </button>
+            </>
+          ))}
           <button
-            onClick={() =>
-              insertDollarSignsAtCursor("\\frac{\\partial}{\\partial x}")
-            }
+            onClick={() => {
+              setButtonName([...buttonName, nameText]);
+              setButtonContent([...buttonContent, contentText]);
+            }}
           >
-            偏微分
+            + 追加
           </button>
+          <input
+            onChange={(event) => {
+              setNameText(event.target.value);
+            }}
+          ></input>
+          <input
+            onChange={(event) => {
+              setContentText(event.target.value);
+            }}
+          ></input>
+          <WordDictionary dictionary={dict} html={html} opts={opts} />
+          {/* ここまで */}
           <div className="wrapper_true">
             <div
               className="convert_markdown"
@@ -244,6 +286,8 @@ function ConvertMarkdown({
     );
   });
 
+  console.log(dictionary);
+
   const parsedHtml = parsing.join("\n");
 
   const options: HTMLReactParserOptions = {
@@ -276,4 +320,29 @@ function ConvertMarkdown({
   };
 
   return <>{parse(parsedHtml, options)}</>;
+}
+
+function WordDictionary({
+  dictionary,
+}: {
+  dictionary: Map<string, string>;
+  html: string;
+  opts: { prefix: string; suffix: string };
+}) {
+  // キーの長さ順にソートした Map を配列として取得
+  const sortedEntries = [...dictionary.entries()].sort(
+    (a, b) => a[0].length - b[0].length,
+  );
+
+  return (
+    <ul>
+      {sortedEntries.map(([key, value], index) => (
+        <li key={index}>
+          <Tippy content={parse(value)} className="markdown_tippy">
+            <span>{key}</span>
+          </Tippy>
+        </li>
+      ))}
+    </ul>
+  );
 }
