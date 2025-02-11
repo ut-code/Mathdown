@@ -18,7 +18,7 @@ type positionInfo = null | { top: number; left: number };
 export default function App() {
   const [markdown, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
-  const [dict, setDict] = useState(new Map());
+  const [dict, setDict] = useState(new Map<string, string>());
   const opts = { prefix: "!define", suffix: "!enddef" };
   const [inputPosition, setInputPosition] = useState<positionInfo>(null);
   const [inputValue, setInputValue] = useState("");
@@ -207,7 +207,24 @@ export default function App() {
               setContentText(event.target.value);
             }}
           ></input>
-          <WordDictionary dictionary={dict} html={html} opts={opts} />
+          <WordDictionary
+            dictionary={dict}
+            html={html}
+            opts={opts}
+            onRemove={(key) => {
+              const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const regex = new RegExp(
+                `!define\\s+${escapedKey}[\\s\\S]*?(?=!define|$)`,
+                "g",
+              );
+              setMarkdown(markdown.replace(regex, ""));
+              setDict((prevDict) => {
+                const newDict = new Map(prevDict);
+                newDict.delete(key);
+                return newDict;
+              });
+            }}
+          />
           {/* ここまで */}
           <div className="wrapper_true">
             <div
@@ -286,8 +303,6 @@ function ConvertMarkdown({
     );
   });
 
-  console.log(dictionary);
-
   const parsedHtml = parsing.join("\n");
 
   const options: HTMLReactParserOptions = {
@@ -324,10 +339,12 @@ function ConvertMarkdown({
 
 function WordDictionary({
   dictionary,
+  onRemove,
 }: {
   dictionary: Map<string, string>;
   html: string;
   opts: { prefix: string; suffix: string };
+  onRemove: (key: string, value: string) => void;
 }) {
   // キーの長さ順にソートした Map を配列として取得
   const sortedEntries = [...dictionary.entries()].sort(
@@ -341,6 +358,7 @@ function WordDictionary({
           <Tippy content={parse(value)} className="markdown_tippy">
             <span>{key}</span>
           </Tippy>
+          <button onClick={() => onRemove(key, value)}>Remove</button>
         </li>
       ))}
     </ul>
