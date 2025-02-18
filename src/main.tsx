@@ -6,6 +6,7 @@ import {
   Routes
 } from "react-router-dom";
 import App from "./App.tsx";
+import App_1 from "./App_1.tsx";
 import AppRouter from "./AppRouters.tsx";
 import "./index.css";
 
