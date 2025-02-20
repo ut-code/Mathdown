@@ -13,7 +13,7 @@ import { replaceExternalSyntax } from "./external-syntax";
 //import pdfFile from "/chibutsu_nyumon.pdf";
 import Textarea from "@mui/joy/Textarea";
 import { Button } from "@mui/material";
-import index.css
+import "./index.css";
 
 import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
@@ -28,10 +28,7 @@ export default function App1() {
   const [markdown, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
   const [dict, setDict] = useState(new Map());
-  const opts = {
-    prefix: "!define",
-    suffix: "!enddef",
-  };
+  const opts = { prefix: "!define", suffix: "!enddef" };
 
   // ドラッグして直接参照できる機能の部分
   const [inputPosition, setInputPosition] = useState<positionInfo>(null); // ドラッグされた位置
@@ -61,21 +58,23 @@ export default function App1() {
   useEffect(() => void insideUseEffect(), [markdown]);
   async function insideUseEffect() {
     // prepare dictionary
-    let d = ExtractDefinitions(markdown, opts.prefix, opts.suffix);
+    const d = ExtractDefinitions(markdown, opts.prefix, opts.suffix);
     const newd = new Map<string, string>();
     const promises: Promise<Map<string, string>>[] = [];
-    d.forEach((v, k) => {
+    d.forEach((v, k) => {// eslint-disable-line
+
       let md = replaceExternalSyntax(v);
-      md = md.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, "");
+      md = md.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, ""); // eslint-disable-line
       //const p = MDToHTML(md).then((newv) => newd.set(k, newv));
       //promises.push(p);
     });
     Promise.all(promises).then(() => setDict(newd));
 
     // prepare HTML
-    var md;
+    let md;
     try {
-      md = replaceExternalSyntax(markdown.replace(/!define[\s\S]*$/m, "")); // !define以下をすべて取り去る。
+      md = replaceExternalSyntax(markdown.replace(/!define[\s\S]*$/m, "")); // !define以下をすべて取り去る。 
+      /* eslint @typescript-eslint/no-explicit-any: 0 */
     } catch (e: any) {
       md = e.toString();
     }
@@ -136,9 +135,7 @@ export default function App1() {
 
   // テキストファイルを保存する
   const saveFile = () => {
-    const blob = new Blob([markdown], {
-      type: ".md, text/markdown",
-    });
+    const blob = new Blob([markdown], { type: ".md, text/markdown" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = localStorage.getItem("filename") ?? "hoge.md"; // localStorage上に保存したファイル名を使う。
@@ -203,7 +200,6 @@ export default function App1() {
         </>
       )}
 
-      
       {/* ドラッグして参照する部分 */}
       {inputPosition && (
         <>
@@ -247,7 +243,7 @@ function ConvertMarkdown({
   html: string;
   opts: { prefix: string; suffix: string };
 }) {
-  let parsing = html.split("\n");
+  const parsing = html.split("\n");
 
   dictionary = new Map(
     [...dictionary.entries()].sort((a, b) => a[0].length - b[0].length),
@@ -268,7 +264,7 @@ function ConvertMarkdown({
     }
   });
 
-  let parsedHtml = parsing.join("\n");
+  const parsedHtml = parsing.join("\n");
 
   const options: HTMLReactParserOptions = {
     replace(domNode) {
@@ -313,6 +309,5 @@ function ConvertMarkdown({
     },
   };
 
-return <>{parse(parsedHtml, options)}</>; // パースされた HTML を返す
-
+  return <>{parse(parsedHtml, options)}</>; // パースされた HTML を返す
 }
