@@ -54,6 +54,7 @@ export default function App() {
       try {
         md = replaceExternalSyntax(md);
       } catch (e: any) {
+        /* eslint @typescript-eslint/no-explicit-any: 0 */
         md = e.toString();
       }
       MDToHTML(md.replaceAll(opts.prefix, "##").replaceAll(opts.suffix, ""))

@@ -22,6 +22,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs
 import Textarea from "@mui/joy/Textarea";
 
 type optsObject = { prefix: string; suffix: string };
+/* eslint @typescript-eslint/no-explicit-any: 0 */
 type pdfType = { numPages: number; getPage: (arg0: number) => any }; // React-pdfで取得されるPDFには、合計ページ数を指す`numPage`属性と、それぞれのページの（文字列などの）情報を含む`getPages`を含む。
 // 使用法
 // const page = await pdf.getPage(5); // 5ページ目の情報取得
@@ -40,6 +41,7 @@ export function ExtractPDF({
   const [result, setResult] = useState<string[]>([]);
   const [explanation, setExplanation] = useState<string>(""); // ユーザー入力の部分。今は暫定的にテキストエリアを置いている。
 
+  /* eslint @typescript-eslint/no-explicit-any: 0 */
   const array: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
   const reactArray: any = array.map((index) => {
     // ページ数をどうにか見える化したい。
@@ -76,6 +78,7 @@ export function ExtractPDF({
   };
 
   // pdfから文字を抜き出す非同期関数
+  /* eslint @typescript-eslint/no-explicit-any: 0 */
   async function extractTextFromPDF(pdf: pdfType) {
     const resultContent: any[] = [];
     const getPageText = async (pageNum: number) => {
