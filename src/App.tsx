@@ -6,7 +6,6 @@ import { MDToHTML } from "./MDToHTML";
 import { replaceExternalSyntax } from "./external-syntax";
 import { ExtractPDF } from "./extractPDF";
 import pdfFile from "/chibutsu_nyumon.pdf";
-import Textarea from "@mui/joy/Textarea";
 import { Button } from "@mui/material";
 import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
@@ -22,11 +21,13 @@ export default function App() {
   const opts = { prefix: "!define", suffix: "!enddef" };
   const [inputPosition, setInputPosition] = useState<positionInfo>(null);
   const [inputValue, setInputValue] = useState("");
+  const [fixedInputValue, setFixedInputValue] = useState("!define");
   const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
   const [visualize, setVisualize] = useState(true);
   const [fileContent, setFileContent] = useState<string>("");
   const [imageData, setImageData] = useState<string>("");
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   // 2/3追加・テンプレート部分
@@ -106,6 +107,12 @@ export default function App() {
     setInputValue(event.target.value);
   };
 
+  const handleFixedInputChange = (event: {
+    target: { value: SetStateAction<string> };
+  }) => {
+    setFixedInputValue(event.target.value);
+  };
+
   const handleScrollSync = (
     sourceRef: React.RefObject<HTMLElement>,
     targetRef: React.RefObject<HTMLElement>,
@@ -116,7 +123,15 @@ export default function App() {
   };
 
   const insertDollarSignsAtCursor = (command: string) => {
-    if (textAreaRef.current) {
+    if (inputRef.current) {
+      const input = inputRef.current;
+      console.log(input.selectionStart, input.selectionEnd);
+      const start = input.selectionStart ?? 0;
+      const end = input.selectionEnd ?? 0;
+      const newText = `${inputValue.slice(0, start)}$$ \n ${command} \n $$${inputValue.slice(end)}`;
+      setInputValue(newText);
+    } else if (textAreaRef.current) {
+      // textAreaRef.currentがnullでないことを確認
       const textarea = textAreaRef.current;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
@@ -140,6 +155,14 @@ export default function App() {
   return (
     <>
       <div className="save_container">
+        <ul>
+          <li>
+            <a href="./home">App1</a>
+          </li>
+          <li>
+            <a href="./ExtractPDF">App2</a>
+          </li>
+        </ul>
         <div className="upload_save">
           <UploadMarkdown onFileContentChange={setFileContent} />
           <Button variant="text" onClick={saveFile}>
@@ -207,10 +230,28 @@ export default function App() {
               setContentText(event.target.value);
             }}
           ></input>
+          <div>
+            <textarea
+              value={fixedInputValue}
+              ref={inputRef}
+              onChange={handleFixedInputChange}
+            />
+            <button
+              onClick={() => {
+                setMarkdown(
+                  (markdown) => markdown + "\n" + fixedInputValue + "\n",
+                );
+                setFixedInputValue("!define");
+              }}
+            >
+              送信
+            </button>
+          </div>
           <WordDictionary
             dictionary={dict}
             html={html}
             opts={opts}
+            // Removeボタンを押した時の処理
             onRemove={(key) => {
               const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
               const regex = new RegExp(
@@ -250,8 +291,9 @@ export default function App() {
       <ExtractPDF pdfName={pdfFile} opts={opts} />
       {inputPosition && (
         <>
-          <Textarea
+          <textarea
             value={inputValue}
+            ref={inputRef}
             onChange={handleInputChange}
             style={{
               position: "absolute",
@@ -262,9 +304,10 @@ export default function App() {
             onBlur={() => setIsTextAreaFocused(false)}
           />
           <button
-            onClick={() =>
-              setMarkdown((markdown) => markdown + "\n" + inputValue + "\n")
-            }
+            onClick={() => {
+              console.log(inputValue);
+              setMarkdown((markdown) => markdown + "\n" + inputValue + "\n");
+            }}
             style={{
               position: "absolute",
               top: `${inputPosition.top - 1}px`,
