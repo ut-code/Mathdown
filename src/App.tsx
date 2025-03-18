@@ -155,14 +155,6 @@ export default function App() {
   return (
     <>
       <div className="save_container">
-        <ul>
-          <li>
-            <a href="./home">App1</a>
-          </li>
-          <li>
-            <a href="./ExtractPDF">App2</a>
-          </li>
-        </ul>
         <div className="upload_save">
           <UploadMarkdown onFileContentChange={setFileContent} />
           <Button variant="text" onClick={saveFile}>
