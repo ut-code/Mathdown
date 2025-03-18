@@ -6,7 +6,6 @@ import { MDToHTML } from "./MDToHTML";
 import { replaceExternalSyntax } from "./external-syntax";
 import { ExtractPDF } from "./extractPDF";
 import pdfFile from "/chibutsu_nyumon.pdf";
-import Textarea from "@mui/joy/Textarea";
 import { Button } from "@mui/material";
 import "katex/dist/katex.min.css";
 import "tippy.js/dist/tippy.css";
@@ -18,16 +17,31 @@ type positionInfo = null | { top: number; left: number };
 export default function App() {
   const [markdown, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
-  const [dict, setDict] = useState(new Map());
+  const [dict, setDict] = useState(new Map<string, string>());
   const opts = { prefix: "!define", suffix: "!enddef" };
   const [inputPosition, setInputPosition] = useState<positionInfo>(null);
   const [inputValue, setInputValue] = useState("");
+  const [fixedInputValue, setFixedInputValue] = useState("!define");
   const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
   const [visualize, setVisualize] = useState(true);
   const [fileContent, setFileContent] = useState<string>("");
   const [imageData, setImageData] = useState<string>("");
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
+
+  // 2/3追加・テンプレート部分
+
+  const [buttonName, setButtonName] = useState<string[]>([
+    "積分記号",
+    "偏微分",
+  ]);
+  const [buttonContent, setButtonContent] = useState<string[]>([
+    "\\int_a^b dx",
+    "\\frac{\\partial}{\\partial x}",
+  ]);
+  const [nameText, setNameText] = useState<string>("");
+  const [contentText, setContentText] = useState<string>("");
 
   useEffect(() => {
     setMarkdown(fileContent);
@@ -93,6 +107,12 @@ export default function App() {
     setInputValue(event.target.value);
   };
 
+  const handleFixedInputChange = (event: {
+    target: { value: SetStateAction<string> };
+  }) => {
+    setFixedInputValue(event.target.value);
+  };
+
   const handleScrollSync = (
     sourceRef: React.RefObject<HTMLElement>,
     targetRef: React.RefObject<HTMLElement>,
@@ -103,7 +123,15 @@ export default function App() {
   };
 
   const insertDollarSignsAtCursor = (command: string) => {
-    if (textAreaRef.current) {
+    if (inputRef.current) {
+      const input = inputRef.current;
+      console.log(input.selectionStart, input.selectionEnd);
+      const start = input.selectionStart ?? 0;
+      const end = input.selectionEnd ?? 0;
+      const newText = `${inputValue.slice(0, start)}$$ \n ${command} \n $$${inputValue.slice(end)}`;
+      setInputValue(newText);
+    } else if (textAreaRef.current) {
+      // textAreaRef.currentがnullでないことを確認
       const textarea = textAreaRef.current;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
@@ -157,16 +185,80 @@ export default function App() {
               編集画面の非表示
             </Button>
           </div>
-          <button onClick={() => insertDollarSignsAtCursor("\\int_a^b dx")}>
-            積分記号
-          </button>
+
+          {/* 2/3追加 テンプレート部 */}
+          {buttonName.map((name, index) => (
+            <>
+              <button
+                onClick={() => insertDollarSignsAtCursor(buttonContent[index])}
+              >
+                {name}
+              </button>
+              <button
+                onClick={() => {
+                  setButtonName(buttonName.filter((_, i) => i !== index));
+                  setButtonContent(buttonContent.filter((_, i) => i !== index));
+                }}
+              >
+                削除
+              </button>
+            </>
+          ))}
           <button
-            onClick={() =>
-              insertDollarSignsAtCursor("\\frac{\\partial}{\\partial x}")
-            }
+            onClick={() => {
+              setButtonName([...buttonName, nameText]);
+              setButtonContent([...buttonContent, contentText]);
+            }}
           >
-            偏微分
+            + 追加
           </button>
+          <input
+            onChange={(event) => {
+              setNameText(event.target.value);
+            }}
+          ></input>
+          <input
+            onChange={(event) => {
+              setContentText(event.target.value);
+            }}
+          ></input>
+          <div>
+            <textarea
+              value={fixedInputValue}
+              ref={inputRef}
+              onChange={handleFixedInputChange}
+            />
+            <button
+              onClick={() => {
+                setMarkdown(
+                  (markdown) => markdown + "\n" + fixedInputValue + "\n",
+                );
+                setFixedInputValue("!define");
+              }}
+            >
+              送信
+            </button>
+          </div>
+          <WordDictionary
+            dictionary={dict}
+            html={html}
+            opts={opts}
+            // Removeボタンを押した時の処理
+            onRemove={(key) => {
+              const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const regex = new RegExp(
+                `!define\\s+${escapedKey}[\\s\\S]*?(?=!define|$)`,
+                "g",
+              );
+              setMarkdown(markdown.replace(regex, ""));
+              setDict((prevDict) => {
+                const newDict = new Map(prevDict);
+                newDict.delete(key);
+                return newDict;
+              });
+            }}
+          />
+          {/* ここまで */}
           <div className="wrapper_true">
             <div
               className="convert_markdown"
@@ -191,8 +283,9 @@ export default function App() {
       <ExtractPDF pdfName={pdfFile} opts={opts} />
       {inputPosition && (
         <>
-          <Textarea
+          <textarea
             value={inputValue}
+            ref={inputRef}
             onChange={handleInputChange}
             style={{
               position: "absolute",
@@ -203,9 +296,10 @@ export default function App() {
             onBlur={() => setIsTextAreaFocused(false)}
           />
           <button
-            onClick={() =>
-              setMarkdown((markdown) => markdown + "\n" + inputValue + "\n")
-            }
+            onClick={() => {
+              console.log(inputValue);
+              setMarkdown((markdown) => markdown + "\n" + inputValue + "\n");
+            }}
             style={{
               position: "absolute",
               top: `${inputPosition.top - 1}px`,
@@ -276,4 +370,32 @@ function ConvertMarkdown({
   };
 
   return <>{parse(parsedHtml, options)}</>;
+}
+
+function WordDictionary({
+  dictionary,
+  onRemove,
+}: {
+  dictionary: Map<string, string>;
+  html: string;
+  opts: { prefix: string; suffix: string };
+  onRemove: (key: string, value: string) => void;
+}) {
+  // キーの長さ順にソートした Map を配列として取得
+  const sortedEntries = [...dictionary.entries()].sort(
+    (a, b) => a[0].length - b[0].length,
+  );
+
+  return (
+    <ul>
+      {sortedEntries.map(([key, value], index) => (
+        <li key={index}>
+          <Tippy content={parse(value)} className="markdown_tippy">
+            <span>{key}</span>
+          </Tippy>
+          <button onClick={() => onRemove(key, value)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
 }
