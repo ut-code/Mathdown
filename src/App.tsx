@@ -13,6 +13,10 @@ import UploadMarkdown from "./uploadMarkdown";
 import UploadImage from "./uploadImage";
 
 type positionInfo = null | { top: number; left: number };
+type TabAreaArgs = {
+  e: React.KeyboardEvent<HTMLTextAreaElement>;
+  ref: React.MutableRefObject<HTMLTextAreaElement | null>;
+};
 
 export default function App() {
   const [markdown, setMarkdown] = useState("");
@@ -29,6 +33,26 @@ export default function App() {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
+
+  const handleTabArea = ({ e, ref }: TabAreaArgs) => {
+    if (e.key !== "Tab") return; // Tabキー以外は処理しない
+
+    e.preventDefault(); // デフォルトのタブ挿入動作を止める
+
+    if (!ref.current) return;
+
+    const textarea = ref.current;
+    const cursorPosition = textarea.selectionStart;
+    const cursorLeft = textarea.value.substring(0, cursorPosition);
+    const cursorRight = textarea.value.substring(cursorPosition);
+
+    // タブの代わりに半角スペース3つを挿入
+    const tabSpaces = "   ";
+    textarea.value = cursorLeft + tabSpaces + cursorRight;
+
+    // カーソルを3文字分進める
+    textarea.selectionStart = textarea.selectionEnd = cursorPosition + 3;
+  };
 
   // 2/3追加・テンプレート部分
 
@@ -273,6 +297,7 @@ export default function App() {
               onScroll={() => handleScrollSync(textAreaRef, previewRef)}
               onChange={(event) => setMarkdown(event.target.value)}
               placeholder="編集画面"
+              onKeyDown={(e) => handleTabArea({ e, ref: textAreaRef })} // ここ
               onFocus={() => setIsTextAreaFocused(true)}
               onBlur={() => setIsTextAreaFocused(false)}
             />
@@ -287,6 +312,7 @@ export default function App() {
             value={inputValue}
             ref={inputRef}
             onChange={handleInputChange}
+            onKeyDown={(e) => handleTabArea({ e, ref: inputRef })} // ここ
             style={{
               position: "absolute",
               top: `${inputPosition.top}px`,
