@@ -388,12 +388,12 @@ function WordDictionary({
 
   return (
     <ul>
-      {sortedEntries.map(([key, value], index) => (
-        <li key={index}>
+      {sortedEntries.map(([key, value]) => (
+        <li style={{ listStyleType: `''` }}>
+          <button onClick={() => onRemove(key, value)}>Remove</button>
           <Tippy content={parse(value)} className="markdown_tippy">
             <span>{key}</span>
           </Tippy>
-          <button onClick={() => onRemove(key, value)}>Remove</button>
         </li>
       ))}
     </ul>
