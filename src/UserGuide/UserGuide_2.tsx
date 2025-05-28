@@ -1,8 +1,7 @@
 function UserGuide_2() {
   return (
     <>
-      <div
-        className="App">
+      <div className="App">
         <a href="/home">
           <img src="../docs/logo.png" width="12.5%" height="12.5%" />
         </a>

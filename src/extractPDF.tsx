@@ -111,11 +111,10 @@ export function ExtractPDF({
 
   return (
     <>
-      <div
-      className="App">
-      <a href="/home">
-        <img src="../docs/logo.png" width="12.5%" height="12.5%"/>
-      </a>
+      <div className="App">
+        <a href="/home">
+          <img src="../docs/logo.png" width="12.5%" height="12.5%" />
+        </a>
       </div>
       <h2>PDFの解説表示</h2>
       <div className="flex">

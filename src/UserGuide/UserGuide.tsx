@@ -1,8 +1,7 @@
 function UserGuide() {
   return (
     <>
-      <div
-        className="App">
+      <div className="App">
         <a href="/home">
           <img src="../docs/logo.png" width="12.5%" height="12.5%" />
         </a>
@@ -14,7 +13,6 @@ function UserGuide() {
         </p>
         ここでは、Mathdownの大まかな機能を説明します。
         通常のMarkdownエディター（Markdownをよく知らない方はこちら）と同様に、編集画面と閲覧画面とがあります。それに加え、Mathdownでは、用語を追加する辞書機能と、編集したものをローカル保存する保存機能とがあります。
-
       </div>
     </>
   );
