@@ -33,6 +33,9 @@ export default function App() {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
+  const [focusedElement, setFocusedElement] = useState<
+    "input" | "textarea" | "textarea2" | null
+  >(null);
 
   const handleTabArea = ({ e, ref }: TabAreaArgs) => {
     if (e.key !== "Tab") return; // Tabキー以外は処理しない
@@ -147,15 +150,16 @@ export default function App() {
   };
 
   const insertDollarSignsAtCursor = (command: string) => {
-    if (inputRef.current) {
+    console.log(focusedElement);
+    if (focusedElement === "input" && inputRef.current) {
       const input = inputRef.current;
-      console.log(input.selectionStart, input.selectionEnd);
       const start = input.selectionStart ?? 0;
       const end = input.selectionEnd ?? 0;
       const newText = `${inputValue.slice(0, start)}$$ \n ${command} \n $$${inputValue.slice(end)}`;
       setInputValue(newText);
-    } else if (textAreaRef.current) {
-      // textAreaRef.currentがnullでないことを確認
+    }
+
+    if (focusedElement === "textarea" && textAreaRef.current) {
       const textarea = textAreaRef.current;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
@@ -164,6 +168,18 @@ export default function App() {
       setTimeout(() => {
         textarea.selectionStart = textarea.selectionEnd = start + 3;
         textarea.focus();
+      }, 0);
+    }
+
+    if (focusedElement === "textarea2" && inputRef.current) {
+      const input = inputRef.current;
+      const start = input.selectionStart ?? 0;
+      const end = input.selectionEnd ?? 0;
+      const newText = `${fixedInputValue.slice(0, start)}$$ \n ${command} \n $$${fixedInputValue.slice(end)}`;
+      setFixedInputValue(newText);
+      setTimeout(() => {
+        input.selectionStart = input.selectionEnd = start + 3;
+        input.focus();
       }, 0);
     }
   };
@@ -251,6 +267,13 @@ export default function App() {
               value={fixedInputValue}
               ref={inputRef}
               onChange={handleFixedInputChange}
+              onFocus={() => {
+                setIsTextAreaFocused(true);
+                setFocusedElement("textarea2");
+              }}
+              onBlur={() => {
+                setIsTextAreaFocused(false);
+              }}
             />
             <button
               onClick={() => {
@@ -298,8 +321,13 @@ export default function App() {
               onChange={(event) => setMarkdown(event.target.value)}
               placeholder="編集画面"
               onKeyDown={(e) => handleTabArea({ e, ref: textAreaRef })} // ここ
-              onFocus={() => setIsTextAreaFocused(true)}
-              onBlur={() => setIsTextAreaFocused(false)}
+              onFocus={() => {
+                setIsTextAreaFocused(true);
+                setFocusedElement("textarea");
+              }}
+              onBlur={() => {
+                setIsTextAreaFocused(false);
+              }}
             />
           </div>
           <br />
@@ -318,8 +346,13 @@ export default function App() {
               top: `${inputPosition.top}px`,
               left: `${inputPosition.left}px`,
             }}
-            onFocus={() => setIsTextAreaFocused(true)}
-            onBlur={() => setIsTextAreaFocused(false)}
+            onFocus={() => {
+              setIsTextAreaFocused(true);
+              setFocusedElement("input");
+            }}
+            onBlur={() => {
+              setIsTextAreaFocused(false);
+            }}
           />
           <button
             onClick={() => {
